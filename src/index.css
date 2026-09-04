@@ -1,0 +1,273 @@
+/* ============================================
+   NOTHING-CORE PORTFOLIO — Design System CSS
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
+/* ---- CSS Variables / Design Tokens ---- */
+:root {
+  /* Core Palette */
+  --nothing-black: #000000;
+  --nothing-red: #FF0000;
+  --nothing-white: #FFFFFF;
+
+  /* Surface Hierarchy (Dark) -- faint cool-navy undertone, echoing the hero city */
+  --surface-lowest: #07080C;
+  --surface-low: #0D0F14;
+  --surface: #111319;
+  --surface-container: #181B22;
+  --surface-container-high: #20242D;
+  --surface-container-highest: #282D38;
+  --surface-bright: #383E4A;
+
+  /* Text */
+  --on-surface: #E8E8E8;
+  --on-surface-variant: #999999;
+  --on-surface-dim: #666666;
+
+  /* Accent -- red (brand/chrome) */
+  --primary: #FF0000;
+  --primary-dim: #CC0000;
+  --primary-glow: rgba(255, 0, 0, 0.15);
+
+  /* Accent -- amber (Education) */
+  --accent-amber: #FFB864;
+  --accent-amber-dim: #CC934F;
+  --accent-amber-glow: rgba(255, 184, 100, 0.15);
+
+  /* Accent -- cyan (Research) */
+  --accent-cyan: #22C3EE;
+  --accent-cyan-dim: #1B9CBD;
+  --accent-cyan-glow: rgba(34, 195, 238, 0.15);
+
+  /* Accent -- green (Experience) */
+  --accent-green: #3DFF7A;
+  --accent-green-dim: #2ACB60;
+  --accent-green-glow: rgba(61, 255, 122, 0.15);
+
+  /* Text/icon color for a solid amber/cyan/green fill -- those hues are too
+     light for white text to read on (see [data-theme="light"] below for why
+     they also need deepening there). Red fills keep --nothing-white. */
+  --on-accent-light: #0B0D12;
+
+  /* Hero-only, theme-invariant -- mirrors cityConfig.js's PORTAL_WINDOW.color
+     by convention (Three.js materials can't consume CSS custom properties). */
+  --hero-portal-green: #3DFF7A;
+
+  /* Squircle radius */
+  --radius-card: 24px;
+  --radius-inner: 16px;
+  --radius-pill: 9999px;
+
+  /* Transitions */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Fonts */
+  --font-headline: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+/* Light Mode */
+[data-theme="light"] {
+  --surface-lowest: #FFFFFF;
+  --surface-low: #F8F8F8;
+  --surface: #F2F2F2;
+  --surface-container: #EBEBEB;
+  --surface-container-high: #E0E0E0;
+  --surface-container-highest: #D5D5D5;
+  --surface-bright: #CCCCCC;
+  --on-surface: #111111;
+  --on-surface-variant: #555555;
+  --on-surface-dim: #888888;
+  --primary-glow: rgba(255, 0, 0, 0.08);
+
+  /* Deepened for legible text/icon contrast on light surfaces -- the dark-mode
+     values are bright hues meant to glow, not sit as small text on white.
+     --primary never needed this since #FF0000 is already dark enough. */
+  --accent-amber: #A8632B;
+  --accent-amber-dim: #8A4F22;
+  --accent-amber-glow: rgba(255, 184, 100, 0.08);
+  --accent-cyan: #0E7FA3;
+  --accent-cyan-dim: #0B6480;
+  --accent-cyan-glow: rgba(34, 195, 238, 0.08);
+  --accent-green: #1C9B54;
+  --accent-green-dim: #157A41;
+  --accent-green-glow: rgba(61, 255, 122, 0.08);
+  /* --hero-portal-green intentionally NOT overridden -- the hero's full-bleed
+     scroll flash should stay maximally vivid in both themes. */
+}
+
+/* ---- Global Reset ---- */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--surface-lowest);
+  color: var(--on-surface);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+::selection {
+  background: var(--primary);
+  color: var(--nothing-white);
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-bright); border-radius: 10px; }
+
+/* ---- Typography ---- */
+.font-headline { font-family: var(--font-headline); }
+.font-body { font-family: var(--font-body); }
+.font-mono { font-family: var(--font-mono); }
+
+/* Dot-Matrix Style */
+.dot-matrix {
+  font-family: var(--font-mono);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ---- Squircle Cards ---- */
+.card {
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  position: relative;
+  transition: transform 0.5s var(--ease-out-expo), box-shadow 0.5s var(--ease-out-expo);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Light mode hard shadows */
+[data-theme="light"] .card {
+  box-shadow: 8px 8px 0px rgba(0,0,0,0.08);
+}
+[data-theme="light"] .card:hover {
+  box-shadow: 12px 12px 0px rgba(0,0,0,0.12);
+}
+
+/* ---- Dot Pattern Background ---- */
+.dot-pattern {
+  background-image: radial-gradient(circle, var(--surface-bright) 1px, transparent 1px);
+  background-size: 12px 12px;
+}
+
+/* ---- Glass Panels (shared frosted-glass primitive) ---- */
+.glass,
+.bento-card {
+  background-color: color-mix(in srgb, var(--card-tint, var(--surface-container)) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(1.15);
+  -webkit-backdrop-filter: blur(20px) saturate(1.15);
+  border: 1px solid color-mix(in srgb, var(--on-surface) 14%, transparent);
+}
+
+/* .bento-card adds a subtle diagonal sheen suggesting reflected light, echoing
+   the hero city's glass facades. background-image paints beneath all child
+   content, so it can never cover text even where a card's own inner divs
+   aren't wrapped in position:relative. Kept separate from .card (which owns
+   the hover-lift/light-mode-shadow) to avoid the two rules fighting over
+   box-shadow on the same element. */
+.bento-card {
+  position: relative;
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--on-surface) 9%, transparent) 0%,
+    transparent 32%,
+    transparent 68%,
+    color-mix(in srgb, var(--on-surface) 4%, transparent) 100%
+  );
+}
+
+/* ---- Pulse Animation ---- */
+@keyframes pulse-red {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-red {
+  animation: pulse-red 2s ease-in-out infinite;
+}
+
+/* ---- Terminal Cursor ---- */
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.cursor-blink::after {
+  content: '▌';
+  color: var(--accent-green);
+  animation: blink 1s step-end infinite;
+  margin-left: 2px;
+}
+
+/* ---- Material Symbols Config ---- */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+}
+
+/* ---- Tag / Pill ---- */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-headline);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: var(--surface-container-highest);
+  color: var(--on-surface);
+  transition: all 0.3s var(--ease-out-expo);
+}
+
+.tag:hover {
+  background: var(--tag-accent, var(--primary));
+  color: var(--tag-accent-on, var(--nothing-white));
+}
+
+/* ---- Mode Toggle Button ---- */
+.mode-toggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--surface-container-high);
+  color: var(--on-surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s var(--ease-out-expo);
+}
+
+.mode-toggle:hover {
+  background: var(--primary);
+  color: var(--nothing-white);
+  transform: rotate(180deg);
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  :root {
+    --radius-card: 16px;
+    --radius-inner: 12px;
+  }
+}
