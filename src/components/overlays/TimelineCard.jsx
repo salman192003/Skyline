@@ -10,18 +10,23 @@ export default function TimelineStack({ items, zoneProgress, accentColor, depthO
 
   const activeIndex = Math.min(Math.floor(zoneProgress / sliceSize), items.length - 1);
   const activeCardStart = activeIndex * sliceSize;
-  const activeCardEnd = (activeIndex + 1) * sliceSize;
 
+  // Card cycle within its slice: fade in (0–15%) → hold (15–55%) → fade out
+  // (55–68%) → gap (68–100%, fully hidden — a deliberate pause before the
+  // next card's own fade-in begins at the start of the next slice).
   const fadeInEnd = activeCardStart + sliceSize * 0.15;
-  const fadeOutStart = activeCardEnd - sliceSize * 0.15;
+  const fadeOutStart = activeCardStart + sliceSize * 0.55;
+  const fadeOutEnd = activeCardStart + sliceSize * 0.68;
 
   let activeOpacity = 0;
   if (zoneProgress >= activeCardStart && zoneProgress <= fadeInEnd) {
     activeOpacity = remap(zoneProgress, activeCardStart, fadeInEnd, 0, 1);
   } else if (zoneProgress > fadeInEnd && zoneProgress < fadeOutStart) {
     activeOpacity = 1;
-  } else if (zoneProgress >= fadeOutStart && zoneProgress <= activeCardEnd) {
-    activeOpacity = remap(zoneProgress, fadeOutStart, activeCardEnd, 1, 0);
+  } else if (zoneProgress >= fadeOutStart && zoneProgress <= fadeOutEnd) {
+    activeOpacity = remap(zoneProgress, fadeOutStart, fadeOutEnd, 1, 0);
+  } else {
+    activeOpacity = 0;
   }
 
   return (

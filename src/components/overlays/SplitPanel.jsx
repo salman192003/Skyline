@@ -16,7 +16,9 @@ export default function SplitPanel({ items, zoneProgress, accentColor }) {
       }}
     >
       {items.map((item, idx) => {
-        const cardDelayStart = 0.05 + idx * 0.1;
+        // Each card's entrance clearly waits for the previous one to finish —
+        // 0.2 to fade in, then a 0.15 pause before the next card starts.
+        const cardDelayStart = 0.05 + idx * 0.35;
         const cardOpacity = remap(zoneProgress, cardDelayStart, cardDelayStart + 0.2, 0, 1);
         const direction = idx % 2 === 0 ? -1 : 1;
         const cardX = (1 - cardOpacity) * 30 * direction;
