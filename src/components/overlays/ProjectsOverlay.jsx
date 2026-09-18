@@ -1,4 +1,5 @@
 import BeatPanel from './BeatPanel';
+import CardGrid from './CardGrid';
 
 const projects = [
   {
@@ -24,6 +25,14 @@ const projects = [
   },
 ];
 
+const items = projects.map((proj) => ({
+  title: proj.name,
+  subtitle: proj.tagline,
+  description: proj.description,
+  tags: proj.tags,
+  stat: proj.stat ? `${proj.stat.label}: ${proj.stat.value}` : null,
+}));
+
 export default function ProjectsOverlay({ zoneProgress, active }) {
   return (
     <BeatPanel
@@ -33,14 +42,9 @@ export default function ProjectsOverlay({ zoneProgress, active }) {
       title="Cool Projects"
       subtitle="Things I've built and loved building // Proof of concept"
       accent="var(--accent-cyan)"
-      accentColor="#22C3EE"
-      items={projects.map((proj) => ({
-        title: proj.name,
-        subtitle: proj.tagline,
-        description: proj.description,
-        tags: proj.tags,
-        stat: proj.stat ? `${proj.stat.label}: ${proj.stat.value}` : null,
-      }))}
-    />
+      bodyMaxWidth="1000px"
+    >
+      <CardGrid items={items} zoneProgress={zoneProgress} accentColor="#22C3EE" />
+    </BeatPanel>
   );
 }

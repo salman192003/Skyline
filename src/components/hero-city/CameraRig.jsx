@@ -1,53 +1,56 @@
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { JOURNEY_PATH } from './cityConfig';
+import {
+  JOURNEY_PATH,
+  easeInOutExpo,
+  remap,
+} from './cityConfig';
+
+// Easing for straight drives: lighter, snappier (near-linear)
+function easeLinear(x) {
+  return x;
+}
+
+// Easing for turns: deliberate, smooth swing
+function easeTurn(x) {
+  return easeInOutExpo(x);
+}
 
 export default function CameraRig({ progressRef }) {
   const { camera } = useThree();
   const lookAtVec = useRef(new THREE.Vector3());
   const euler = useRef(new THREE.Euler(0, 0, 0, 'YXZ'));
 
-  // Build one continuous spline through every waypoint's position, and a second
-  // through every waypoint's look-at target. Centripetal Catmull-Rom avoids the
-  // loops/cusps uniform parameterization can produce at sharp turns.
-  //
-  // This replaces the old per-segment lerp+ease approach, which eased each
-  // segment in and out from a dead stop at every waypoint -- individually smooth
-  // curves, but velocity hit zero at every junction, reading as a stop-start
-  // stutter through the whole drive. A single spline sampled with getPointAt
-  // (arc-length parameterized) has continuous velocity end to end: no stops.
-  const { posCurve, targetCurve } = useMemo(() => {
-    const posPoints = JOURNEY_PATH.map((wp) => wp.pos);
-    const targetPoints = JOURNEY_PATH.map((wp) => wp.target);
-    return {
-      posCurve: new THREE.CatmullRomCurve3(posPoints, false, 'centripetal'),
-      targetCurve: new THREE.CatmullRomCurve3(targetPoints, false, 'centripetal'),
-    };
-  }, []);
-
   useFrame(() => {
-    const p = THREE.MathUtils.clamp(progressRef.current ?? 0, 0, 1);
+    const p = progressRef.current ?? 0;
 
-    const pos = posCurve.getPointAt(p);
-    const target = targetCurve.getPointAt(p);
+    // Map progress (0–1) to a waypoint segment
+    const numSegments = JOURNEY_PATH.length - 1;
+    const segmentIndex = Math.min(Math.floor(p * numSegments), numSegments - 1);
+    const segmentProgress = remap(p, segmentIndex / numSegments, (segmentIndex + 1) / numSegments, 0, 1);
 
-    camera.position.copy(pos);
-    lookAtVec.current.copy(target);
+    const from = JOURNEY_PATH[segmentIndex];
+    const to = JOURNEY_PATH[segmentIndex + 1];
+
+    // Use turn-optimized easing for turn waypoints, linear for straight drives
+    const isFromTurn = from.turn;
+    const eased = isFromTurn ? easeTurn(segmentProgress) : easeLinear(segmentProgress);
+
+    camera.position.lerpVectors(from.pos, to.pos, eased);
+    lookAtVec.current.lerpVectors(from.target, to.target, eased);
     camera.lookAt(lookAtVec.current);
 
-    // Bank into turns based on how sharply the travel direction is curving,
-    // rather than a fixed tilt tied to hand-marked "turn" waypoints -- this
-    // stays smooth and proportional to the actual curve of the spline at
-    // every point along the drive, not just at discrete corners.
-    const delta = 0.006;
-    const p0 = Math.max(0, p - delta);
-    const p1 = Math.min(1, p + delta);
-    const tangentPrev = posCurve.getTangentAt(p0);
-    const tangentNext = posCurve.getTangentAt(p1);
-    const turnRate = tangentPrev.cross(tangentNext).y;
-    const rollAngle = THREE.MathUtils.clamp(turnRate * 12, -0.09, 0.09);
+    // Apply subtle camera tilt during turns (simulating vehicle lean)
+    // Peak tilt at 50% through the turn segment
+    let rollAngle = 0;
+    if (isFromTurn) {
+      // Tilt builds to peak at ~50%, then subsides
+      const tiltAmount = eased < 0.5 ? eased * 2 : (1 - eased) * 2;
+      rollAngle = tiltAmount * 0.08; // ~4.6° max tilt
+    }
 
+    // Apply roll to camera
     euler.current.setFromQuaternion(camera.quaternion, 'YXZ');
     euler.current.z = rollAngle;
     camera.quaternion.setFromEuler(euler.current);

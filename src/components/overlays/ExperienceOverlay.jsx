@@ -1,4 +1,5 @@
 import BeatPanel from './BeatPanel';
+import TimelineStack from './TimelineCard';
 
 const experiences = [
   {
@@ -50,6 +51,15 @@ const experiences = [
   },
 ];
 
+const items = experiences.map((exp) => ({
+  title: exp.company,
+  subtitle: exp.role,
+  period: exp.period,
+  description: exp.highlights.join(' • '),
+  tags: exp.tags,
+  stat: exp.stat ? `${exp.stat.label}: ${exp.stat.value}` : null,
+}));
+
 export default function ExperienceOverlay({ zoneProgress, active }) {
   return (
     <BeatPanel
@@ -59,15 +69,9 @@ export default function ExperienceOverlay({ zoneProgress, active }) {
       title="Career Moves"
       subtitle="Shipping code that matters // Real-world impact"
       accent="var(--primary)"
-      accentColor="#FF0000"
-      items={experiences.map((exp) => ({
-        title: exp.company,
-        subtitle: exp.role,
-        period: exp.period,
-        description: exp.highlights.join(' • '),
-        tags: exp.tags,
-        stat: exp.stat ? `${exp.stat.label}: ${exp.stat.value}` : null,
-      }))}
-    />
+      bodyMaxWidth="700px"
+    >
+      <TimelineStack items={items} zoneProgress={zoneProgress} accentColor="#FF0000" />
+    </BeatPanel>
   );
 }

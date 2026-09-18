@@ -1,4 +1,5 @@
 import BeatPanel from './BeatPanel';
+import SplitPanel from './SplitPanel';
 
 const educationItems = [
   {
@@ -26,8 +27,9 @@ export default function EducationOverlay({ zoneProgress, active }) {
       title="School & Fun Stuff"
       subtitle="Brain fuel and what keeps the mind sharp"
       accent="var(--accent-amber)"
-      accentColor="#FFB864"
-      items={educationItems}
-    />
+      bodyMaxWidth="900px"
+    >
+      <SplitPanel items={educationItems} zoneProgress={zoneProgress} accentColor="#FFB864" />
+    </BeatPanel>
   );
 }

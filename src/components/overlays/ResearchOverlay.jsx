@@ -1,4 +1,5 @@
 import BeatPanel from './BeatPanel';
+import TimelineStack from './TimelineCard';
 
 const researchItems = [
   {
@@ -44,8 +45,9 @@ export default function ResearchOverlay({ zoneProgress, active }) {
       title="Research & Teaching"
       subtitle="Deep dives & mentoring // Giving back while pushing forward"
       accent="var(--accent-green)"
-      accentColor="#3DFF7A"
-      items={researchItems}
-    />
+      bodyMaxWidth="700px"
+    >
+      <TimelineStack items={researchItems} zoneProgress={zoneProgress} accentColor="#3DFF7A" />
+    </BeatPanel>
   );
 }

@@ -1,12 +1,11 @@
 import { motion } from 'framer-motion';
 import { remap } from '../hero-city/cityConfig';
 import SectionHeader from '../SectionHeader';
-import TimelineStack from './TimelineCard';
 
-// Shared layout for every list-style beat (Education, Experience, Projects, Research):
-// header on top, card stack below, both fading/scaling together as one column.
-// This is the single source of truth for beat-panel design language — header always
-// stays visible above the stack, spacing and fade timing are identical across beats.
+// Shared wrapper for every beat: header always fades/positions the same way,
+// but the body underneath is passed in as children — each beat picks whatever
+// layout actually suits its content (stack, grid, split, custom), while still
+// inheriting identical header treatment, fade timing, and positioning rhythm.
 export default function BeatPanel({
   zoneProgress,
   active,
@@ -14,8 +13,8 @@ export default function BeatPanel({
   title,
   subtitle,
   accent,
-  accentColor,
-  items,
+  bodyMaxWidth = '700px',
+  children,
 }) {
   const fadeInStart = 0;
   const fadeInEnd = 0.15;
@@ -49,22 +48,21 @@ export default function BeatPanel({
         padding: '96px 32px 32px',
       }}
     >
-      {/* Header — always sits above the card stack, never covered by it */}
+      {/* Header — always sits above the body, never covered by it */}
       <motion.div style={{ opacity: contentOpacity, maxWidth: '700px', width: '100%', flexShrink: 0 }}>
         <SectionHeader label={label} title={title} subtitle={subtitle} accent={accent} />
       </motion.div>
 
-      {/* Card stack — sized box the stack fills, positioned in normal flow below the header */}
+      {/* Body — layout varies per beat (stack / grid / split), sizing varies too */}
       <motion.div
         style={{
           opacity: contentOpacity,
           width: '100%',
-          maxWidth: '700px',
-          height: 'clamp(360px, 48vh, 460px)',
+          maxWidth: bodyMaxWidth,
           position: 'relative',
         }}
       >
-        <TimelineStack items={items} zoneProgress={zoneProgress} accentColor={accentColor} />
+        {typeof children === 'function' ? children(contentOpacity) : children}
       </motion.div>
     </motion.div>
   );
