@@ -7,12 +7,12 @@ import {
   remap,
 } from './cityConfig';
 
-// Soft easing for straight drives: smooth without being floaty (easeInOutQuad)
-function easeDrive(x) {
-  return x < 0.5 ? 2 * x * x : -1 + (4 - 2 * x) * x;
+// Easing for straight drives: lighter, snappier (near-linear)
+function easeLinear(x) {
+  return x;
 }
 
-// Easing for turns: more deliberate, very smooth (easeInOutExpo)
+// Easing for turns: deliberate, smooth swing
 function easeTurn(x) {
   return easeInOutExpo(x);
 }
@@ -33,9 +33,9 @@ export default function CameraRig({ progressRef }) {
     const from = JOURNEY_PATH[segmentIndex];
     const to = JOURNEY_PATH[segmentIndex + 1];
 
-    // Use turn-optimized easing for turn waypoints, smooth drive easing for straights
+    // Use turn-optimized easing for turn waypoints, linear for straight drives
     const isFromTurn = from.turn;
-    const eased = isFromTurn ? easeTurn(segmentProgress) : easeDrive(segmentProgress);
+    const eased = isFromTurn ? easeTurn(segmentProgress) : easeLinear(segmentProgress);
 
     camera.position.lerpVectors(from.pos, to.pos, eased);
     lookAtVec.current.lerpVectors(from.target, to.target, eased);

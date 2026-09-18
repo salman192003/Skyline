@@ -22,7 +22,7 @@ const OVERLAY_COMPONENTS = [
   ContactOverlay,
 ];
 
-export default function CityJourney({ isLoaded, theme = 'dark' }) {
+export default function CityJourney({ isLoaded }) {
   const sectionRef = useRef(null);
   const progressRef = useRef(0);
   const [overlayProgress, setOverlayProgress] = useState(0);
@@ -83,7 +83,7 @@ export default function CityJourney({ isLoaded, theme = 'dark' }) {
       >
         {/* 3D City Scene */}
         <div style={{ position: 'absolute', inset: 0 }}>
-          <HeroCityScene progressRef={progressRef} theme={theme} />
+          <HeroCityScene progressRef={progressRef} />
         </div>
 
         {/* Beat overlays */}

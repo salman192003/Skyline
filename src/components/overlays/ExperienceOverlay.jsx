@@ -1,33 +1,59 @@
 import { motion } from 'framer-motion';
 import { remap } from '../hero-city/cityConfig';
 import SectionHeader from '../SectionHeader';
+import TimelineCard from './TimelineCard';
 
 const experiences = [
   {
+    company: 'AdalFi',
+    role: 'Software Engineer',
+    period: 'Aug. 2026 – Present',
+    icon: 'code',
+    highlights: [
+      'Building AI-driven financial systems that make credit more accessible and inclusive.',
+      'Developing scalable backend architectures for next-gen fintech platforms.',
+    ],
+    tags: ['AI/ML', 'FINTECH', 'FULL-STACK', 'SYSTEMS DESIGN'],
+    stat: { label: 'ROLE', value: 'FULL-TIME' },
+  },
+  {
+    company: 'i2c Inc.',
+    role: 'Associate Software Engineer',
+    period: 'Jun. 2026 – Aug. 2026',
+    icon: 'cloud',
+    highlights: [
+      'Contributed to Java/Spring Boot backend supporting large-scale credit/debit card processing.',
+      'Investigated and resolved backend issues through log analysis, exception tracing, and concurrency debugging.',
+      'Built strong fintech domain knowledge through extensive codebase exploration and system design understanding.',
+    ],
+    tags: ['JAVA', 'SPRING BOOT', 'FINTECH', 'BACKEND'],
+    stat: { label: 'SCALE', value: 'PRODUCTION' },
+  },
+  {
     company: '10Pearls',
-    role: 'Software Engineering Intern',
+    role: 'Software Engineer Intern',
     period: 'Dec. 2025 – Feb. 2026',
     icon: 'code',
     highlights: [
-      'Architected scalable RESTful services using ASP.NET Core, implementing JWT and OAuth2.',
-      'Optimized SQL Server performance via indexing & query profiling, -35% response time.',
-      'Engineered CI/CD pipelines & testing suites with 85% code coverage.',
+      'Engineered multi-tenant backend architectures with ASP.NET Core, building high-throughput RESTful APIs.',
+      'Profiled high-traffic endpoints to isolate bottlenecks, slashing latency by 35% through SQL Server indexing & Redis caching.',
+      'Architected end-to-end service reliability via automated CI/CD and SonarQube quality gates.',
     ],
-    tags: ['ASP.NET CORE', 'SQL SERVER', 'C#', 'CI/CD'],
-    stat: { label: 'RESPONSE TIME', value: '-35%' },
+    tags: ['ASP.NET CORE', 'SQL SERVER', 'REDIS', 'CI/CD'],
+    stat: { label: 'LATENCY REDUCTION', value: '-35%' },
   },
   {
-    company: 'Netsol Technologies Ltd.',
+    company: 'NETSOL Technologies Inc.',
     role: 'Software Engineering Intern',
-    period: 'July 2025 – Aug. 2025',
+    period: 'Jul. 2025 – Aug. 2025',
     icon: 'cloud',
     highlights: [
-      'Engineered enterprise backend using Java Spring Boot with modular data layers.',
-      'Built LLM-powered data transformation pipeline for analytical intelligence.',
-      'Refactored legacy Java modules with Design Patterns for banking systems.',
+      'Architected backend systems into microservices using Java Spring Boot, defining service boundaries and REST communication.',
+      'Evaluated and optimized computer vision models, integrating Django-based inference pipeline for real-time predictions.',
+      'Collaborated in Agile sprint cycles, delivering milestones ahead of schedule.',
     ],
-    tags: ['JAVA', 'SPRING BOOT', 'LLM', 'DESIGN PATTERNS'],
-    stat: { label: 'PIPELINE', value: 'LLM-DRIVEN' },
+    tags: ['JAVA', 'SPRING BOOT', 'MICROSERVICES', 'CV/ML'],
+    stat: { label: 'DELIVERY', value: 'AHEAD OF SCHEDULE' },
   },
 ];
 
@@ -72,79 +98,31 @@ export default function ExperienceOverlay({ zoneProgress, active }) {
           />
         </motion.div>
 
-        <motion.div style={{ marginTop: '40px', opacity: contentOpacity, display: 'grid', gap: '20px' }}>
-          {experiences.map((exp, idx) => (
-            <motion.div
-              key={exp.company}
-              className="bento-card card"
-              style={{
-                padding: '32px',
-                '--card-tint': 'var(--surface-container)',
-                position: 'relative',
-                overflow: 'hidden',
-              }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: contentOpacity, y: 0 }}
-              transition={{ delay: 0.1 + idx * 0.1 }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-40px',
-                  right: '-40px',
-                  width: '150px',
-                  height: '150px',
-                  borderRadius: '50%',
-                  background: 'rgba(255, 0, 0, 0.1)',
-                  filter: 'blur(60px)',
-                  pointerEvents: 'none',
-                }}
+        <motion.div style={{ marginTop: '40px', opacity: contentOpacity }}>
+          {experiences.map((exp, idx) => {
+            // Format highlights as description
+            const description = exp.highlights ? exp.highlights.join(' • ') : '';
+            const item = {
+              title: exp.company,
+              subtitle: exp.role,
+              period: exp.period,
+              description,
+              tags: exp.tags,
+              stat: exp.stat ? `${exp.stat.label}: ${exp.stat.value}` : null,
+              accentColor: '#FF0000', // Red for experience
+            };
+
+            return (
+              <TimelineCard
+                key={exp.company}
+                index={idx}
+                total={experiences.length}
+                item={item}
+                zoneProgress={zoneProgress}
+                isLeft={idx % 2 === 0}
               />
-
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: '16px', marginBottom: '16px' }}>
-                  <div>
-                    <h3 className="font-headline" style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--on-surface)' }}>
-                      {exp.company}
-                    </h3>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--on-surface-dim)', marginTop: '4px' }}>
-                      {exp.role}
-                    </p>
-                  </div>
-                  <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', whiteSpace: 'nowrap' }}>
-                    {exp.period}
-                  </span>
-                </div>
-
-                <ul style={{ marginBottom: '16px', paddingLeft: '20px' }}>
-                  {exp.highlights.map((h, i) => (
-                    <li key={i} style={{ fontSize: '0.8rem', color: 'var(--on-surface-variant)', marginBottom: '8px', lineHeight: 1.5 }}>
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {exp.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      style={{
-                        padding: '4px 12px',
-                        background: 'var(--primary)',
-                        color: 'var(--nothing-white)',
-                        borderRadius: '4px',
-                        fontSize: '0.65rem',
-                        fontWeight: 600,
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+            );
+          })}
         </motion.div>
       </div>
     </motion.div>

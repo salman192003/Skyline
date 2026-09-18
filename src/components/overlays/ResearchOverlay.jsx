@@ -1,22 +1,40 @@
 import { motion } from 'framer-motion';
 import { remap } from '../hero-city/cityConfig';
 import SectionHeader from '../SectionHeader';
+import TimelineCard from './TimelineCard';
 
 const researchItems = [
   {
-    title: 'Computer Vision & Graphics Lab (CVGL)',
+    title: 'LUMSx Research & Teaching Assistant',
     subtitle: 'LUMS',
-    period: 'Active',
-    description: 'Working on computer vision research. Exploring novel approaches to image processing and scene understanding.',
-    tags: ['COMPUTER VISION', 'RESEARCH', 'DEEP LEARNING'],
+    period: 'Jul. 2026 – Present',
+    description: 'Supporting industry professionals in developing advanced skills in Data Science, analytics, and practical machine learning workflows.',
+    tags: ['DATA SCIENCE', 'ML', 'MENTORSHIP', 'REMOTE'],
+    stat: 'PART-TIME',
+  },
+  {
+    title: 'Undergraduate Researcher',
+    subtitle: 'Computer Vision & Graphics Lab, LUMS',
+    period: 'May 2025 – Jul. 2026',
+    description: 'Developed a novel saliency-guided curriculum learning framework for Knowledge Distillation. Engineered and benchmarked ResNet, Wide ResNet, and ViT architectures, improving student model performance while reducing training time by up to 40%. Work extended to ECCV 2026 and WACV 2027 submissions.',
+    tags: ['COMPUTER VISION', 'KNOWLEDGE DISTILLATION', 'DEEP LEARNING', 'RESEARCH'],
+    stat: '40% SPEEDUP',
   },
   {
     title: 'Teaching Assistant — Algorithms',
-    subtitle: 'LUMS',
+    subtitle: 'LUMS, CS 310 / 5102',
     period: 'Aug. 2025 – Dec. 2025',
-    description: 'Designed & evaluated algorithmic assessments for 300+ students. Mentored on DP, graph theory, and coding fundamentals.',
+    description: 'Conducted weekly office hours to guide 300+ students with coursework and exam prep. Collaborated on coursework testing and exam evaluation. Coordinated with instructor Dr. Imdad Ullah Khan on course objectives.',
     tags: ['TEACHING', 'MENTORSHIP', 'ALGORITHMS'],
-    stat: 'STUDENTS: 300+',
+    stat: '300+ STUDENTS',
+  },
+  {
+    title: 'Teaching Assistant — Digital Logic Design',
+    subtitle: 'LUMS',
+    period: 'Jan. 2025 – Jul. 2025',
+    description: 'Led weekly 3-hour labs on hardware modeling and digital design. Mentored students on end-of-course projects and exam preparation. Collaborated with TAs on effective assessment design.',
+    tags: ['TEACHING', 'DIGITAL LOGIC', 'HARDWARE DESIGN'],
+    stat: '3-HR LABS',
   },
 ];
 
@@ -61,77 +79,24 @@ export default function ResearchOverlay({ zoneProgress, active }) {
           />
         </motion.div>
 
-        <motion.div style={{ marginTop: '40px', opacity: contentOpacity, display: 'grid', gap: '20px' }}>
+        <motion.div style={{ marginTop: '40px', opacity: contentOpacity }}>
           {researchItems.map((item, idx) => (
-            <motion.div
+            <TimelineCard
               key={item.title}
-              className="bento-card card"
-              style={{
-                padding: '28px',
-                '--card-tint': 'var(--surface-container)',
-                position: 'relative',
-                overflow: 'hidden',
+              index={idx}
+              total={researchItems.length}
+              item={{
+                title: item.title,
+                subtitle: item.subtitle,
+                period: item.period,
+                description: item.description,
+                tags: item.tags,
+                stat: item.stat,
+                accentColor: '#3DFF7A', // Green for research
               }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: contentOpacity, y: 0 }}
-              transition={{ delay: 0.1 + idx * 0.1 }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-40px',
-                  right: '-40px',
-                  width: '150px',
-                  height: '150px',
-                  borderRadius: '50%',
-                  background: 'rgba(61, 255, 122, 0.1)',
-                  filter: 'blur(60px)',
-                  pointerEvents: 'none',
-                }}
-              />
-
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: '16px', marginBottom: '12px' }}>
-                  <div>
-                    <h3 className="font-headline" style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--on-surface)' }}>
-                      {item.title}
-                    </h3>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-dim)' }}>
-                      {item.subtitle} · {item.period}
-                    </p>
-                  </div>
-                </div>
-
-                <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-variant)', lineHeight: 1.6, marginBottom: '12px' }}>
-                  {item.description}
-                </p>
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {item.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      style={{
-                        padding: '4px 12px',
-                        background: 'var(--accent-green)',
-                        color: 'var(--on-accent-light)',
-                        borderRadius: '4px',
-                        fontSize: '0.65rem',
-                        fontWeight: 600,
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {item.stat && (
-                  <div style={{ marginTop: '12px', fontSize: '0.75rem', color: 'var(--accent-green)', fontWeight: 600 }}>
-                    {item.stat}
-                  </div>
-                )}
-              </div>
-            </motion.div>
+              zoneProgress={zoneProgress}
+              isLeft={idx % 2 === 0}
+            />
           ))}
         </motion.div>
       </div>

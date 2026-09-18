@@ -576,67 +576,49 @@ export const FINAL_CAMERA_POS = PORTAL_WINDOW
     )
   : INTO_CITY_POS.clone();
 
-// Driving path through the city grid: many waypoints for ultra-smooth curves.
-// Each segment is short so the camera motion feels fluid.
+// Driving path through the city grid: a sequence of waypoints forming a route
+// that drives down streets and turns at intersections. Combined with BEAT_RANGES,
+// this lets overlays key off the journey without needing dedicated per-beat waypoints.
+// Intermediate waypoints are added for smooth curves.
 export const JOURNEY_PATH = [
   // Intro: wide establishing shot (camera starts here)
   { pos: SIDE_VIEW_POS.clone(), target: SIDE_VIEW_TARGET.clone(), turn: false },
 
-  // Intro → Education: drive down the main avenue (x=0)
-  { pos: new THREE.Vector3(0, 2.7, 22), target: new THREE.Vector3(0, 2.3, 12), turn: false },
-  { pos: new THREE.Vector3(0, 2.7, 19), target: new THREE.Vector3(0, 2.3, 9), turn: false },
-  { pos: new THREE.Vector3(0, 2.7, 16), target: new THREE.Vector3(0, 2.3, 6), turn: false },
-  { pos: new THREE.Vector3(0, 2.7, 13), target: new THREE.Vector3(0, 2.3, 3), turn: false },
-  { pos: new THREE.Vector3(0, 2.7, 10), target: new THREE.Vector3(0, 2.3, 0), turn: false },
-  { pos: new THREE.Vector3(0, 2.7, 7), target: new THREE.Vector3(0, 2.3, -3), turn: false },
-  { pos: new THREE.Vector3(0, 2.7, 4), target: new THREE.Vector3(0, 2.3, -6), turn: false },
-  { pos: new THREE.Vector3(0, 2.7, 1), target: new THREE.Vector3(0, 2.3, -9), turn: false },
+  // Intro → Education: drive down the main avenue (x=0) with smooth waypoints
+  { pos: new THREE.Vector3(0, 2.7, 22), target: new THREE.Vector3(0, 2.3, 10), turn: false },
+  { pos: new THREE.Vector3(0, 2.7, 15), target: new THREE.Vector3(0, 2.3, 3), turn: false },
+  { pos: new THREE.Vector3(0, 2.7, 8), target: new THREE.Vector3(0, 2.3, -8), turn: false },
 
-  // Turn at cross street
-  { pos: new THREE.Vector3(0, 2.7, -2), target: new THREE.Vector3(3, 2.3, -12), turn: true },
-  { pos: new THREE.Vector3(0, 2.7, -8), target: new THREE.Vector3(6, 2.3, -14), turn: false },
+  // Turn at cross street (transition to Education → Experience)
+  { pos: new THREE.Vector3(0, 2.7, -11), target: new THREE.Vector3(4, 2.3, -14), turn: true },
   { pos: new THREE.Vector3(0, 2.7, -14), target: new THREE.Vector3(8.2, 2.3, -14), turn: false },
 
-  // Education → Experience: drive along cross street
-  { pos: new THREE.Vector3(3, 2.7, -14), target: new THREE.Vector3(11, 2.3, -14), turn: false },
+  // Education → Experience: drive along cross street with smooth waypoints
   { pos: new THREE.Vector3(6, 2.7, -14), target: new THREE.Vector3(14, 2.3, -14), turn: false },
-  { pos: new THREE.Vector3(9, 2.7, -14), target: new THREE.Vector3(17, 2.3, -14), turn: false },
   { pos: new THREE.Vector3(12, 2.7, -14), target: new THREE.Vector3(20, 2.3, -14), turn: false },
-  { pos: new THREE.Vector3(15, 2.7, -14), target: new THREE.Vector3(22, 2.3, -16), turn: false },
 
-  // Turn back toward avenue
-  { pos: new THREE.Vector3(16, 2.7, -15), target: new THREE.Vector3(10, 2.3, -20), turn: true },
-  { pos: new THREE.Vector3(16, 2.7, -16.4), target: new THREE.Vector3(8, 2.3, -22), turn: false },
-  { pos: new THREE.Vector3(14, 2.7, -18), target: new THREE.Vector3(6, 2.3, -25), turn: false },
+  // Turn back toward the avenue
+  { pos: new THREE.Vector3(16, 2.7, -15), target: new THREE.Vector3(8, 2.3, -22), turn: true },
+  { pos: new THREE.Vector3(18, 2.7, -16.4), target: new THREE.Vector3(8, 2.3, -24), turn: false },
 
-  // Experience: back down avenue
-  { pos: new THREE.Vector3(12, 2.7, -20), target: new THREE.Vector3(2, 2.3, -28), turn: false },
-  { pos: new THREE.Vector3(10, 2.7, -22), target: new THREE.Vector3(0, 2.3, -29), turn: false },
-  { pos: new THREE.Vector3(6, 2.7, -24), target: new THREE.Vector3(-2, 2.3, -30), turn: false },
-  { pos: new THREE.Vector3(2, 2.7, -25), target: new THREE.Vector3(-4, 2.3, -31), turn: false },
-  { pos: new THREE.Vector3(0.7, 2.7, -26), target: new THREE.Vector3(-4, 2.3, -32), turn: false },
+  // Experience: back down avenue with smooth waypoints
+  { pos: new THREE.Vector3(8, 2.7, -20), target: new THREE.Vector3(0, 2.3, -28), turn: false },
+  { pos: new THREE.Vector3(0.7, 2.7, -22), target: new THREE.Vector3(0, 2.3, -30), turn: false },
 
   // Turn for Projects
-  { pos: new THREE.Vector3(0, 2.7, -26), target: new THREE.Vector3(-4, 2.3, -28), turn: true },
-  { pos: new THREE.Vector3(-2, 2.7, -28), target: new THREE.Vector3(-8.2, 2.3, -28), turn: false },
+  { pos: new THREE.Vector3(0, 2.7, -25), target: new THREE.Vector3(-4, 2.3, -28), turn: true },
   { pos: new THREE.Vector3(0, 2.7, -28), target: new THREE.Vector3(-8.2, 2.3, -28), turn: false },
 
-  // Projects: cross street
-  { pos: new THREE.Vector3(-3, 2.7, -28), target: new THREE.Vector3(-11, 2.3, -28), turn: false },
+  // Projects: cross street with smooth waypoints
   { pos: new THREE.Vector3(-6, 2.7, -28), target: new THREE.Vector3(-14, 2.3, -28), turn: false },
-  { pos: new THREE.Vector3(-9, 2.7, -28), target: new THREE.Vector3(-17, 2.3, -28), turn: false },
   { pos: new THREE.Vector3(-14, 2.7, -28), target: new THREE.Vector3(-20, 2.3, -28), turn: false },
-  { pos: new THREE.Vector3(-17, 2.7, -28), target: new THREE.Vector3(-22, 2.3, -30), turn: false },
 
   // Turn back toward avenue
-  { pos: new THREE.Vector3(-16, 2.7, -29), target: new THREE.Vector3(-10, 2.3, -34), turn: true },
-  { pos: new THREE.Vector3(-16, 2.7, -30.8), target: new THREE.Vector3(-8, 2.3, -36), turn: false },
-  { pos: new THREE.Vector3(-14, 2.7, -32), target: new THREE.Vector3(-6, 2.3, -38), turn: false },
+  { pos: new THREE.Vector3(-16, 2.7, -29), target: new THREE.Vector3(-8, 2.3, -36), turn: true },
+  { pos: new THREE.Vector3(-16.4, 2.7, -30.8), target: new THREE.Vector3(-8, 2.3, -38), turn: false },
 
-  // Research: final avenue stretch
-  { pos: new THREE.Vector3(-10, 2.7, -32), target: new THREE.Vector3(-2, 2.3, -39), turn: false },
-  { pos: new THREE.Vector3(-6, 2.7, -33), target: new THREE.Vector3(0, 2.3, -40), turn: false },
-  { pos: new THREE.Vector3(-2, 2.7, -34), target: new THREE.Vector3(0, 2.3, -40), turn: false },
+  // Research: final avenue stretch with smooth waypoints
+  { pos: new THREE.Vector3(-8, 2.7, -32), target: new THREE.Vector3(0, 2.3, -40), turn: false },
   { pos: new THREE.Vector3(0.7, 2.7, -34), target: new THREE.Vector3(0, 2.3, -40), turn: false },
 
   // Final turn toward the portal window
@@ -657,7 +639,7 @@ export const BEAT_RANGES = [
   { id: 'contact', startT: 0.76, endT: 1.00, color: '#3DFF7A', label: 'How to get in touch?' },
 ];
 
-const COLORS_DARK = {
+export const COLORS = {
   ground: '#0c0d10',
   sidewalk: '#71757d',
   road: '#0a0b0e',
@@ -678,37 +660,6 @@ const COLORS_DARK = {
   skyZenith: '#1a1f3d',
   moon: '#fdf6e3',
 };
-
-const COLORS_LIGHT = {
-  ground: '#e8e8e8',
-  sidewalk: '#c5c5c5',
-  road: '#f0f0f0',
-  roadLine: '#999999',
-  emissiveRed: '#FF0000',
-  background: '#f5f5f5',
-  fog: '#f5f5f5',
-  ambientSky: '#87ceeb',
-  ambientGround: '#ffffff',
-  lampGlow: '#ffcc66',
-  trafficRed: '#ff3b30',
-  trafficYellow: '#ffcc33',
-  trafficGreen: '#3ddc84',
-  signPlate: '#1c5fbf',
-  crosswalk: '#999999',
-  skyHorizon: '#b0d4f0',
-  skyGlow: '#ffd699',
-  skyZenith: '#87ceeb',
-  moon: '#ffffff',
-};
-
-// Get colors based on current theme
-export function getSceneColors() {
-  const isDark = !document.documentElement.getAttribute('data-theme') ||
-                 document.documentElement.getAttribute('data-theme') === 'dark';
-  return isDark ? COLORS_DARK : COLORS_LIGHT;
-}
-
-export const COLORS = COLORS_DARK; // Default to dark for initial load
 
 export function easeInOutExpo(x) {
   if (x <= 0) return 0;
