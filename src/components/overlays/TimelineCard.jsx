@@ -5,7 +5,7 @@ import BeatCard from './BeatCard';
 // Chronological, one-at-a-time card stack — for content that reads as a sequence
 // (career history, research/teaching timeline). Active card front and center,
 // up to 2 previous cards receding in depth behind it.
-export default function TimelineStack({ items, zoneProgress, accentColor, depthOpacityBoost = 0 }) {
+export default function TimelineStack({ items, zoneProgress, accentColor, depthOpacityBoost = 0, solidCards = false }) {
   const sliceSize = 1 / items.length;
 
   const activeIndex = Math.min(Math.floor(zoneProgress / sliceSize), items.length - 1);
@@ -42,7 +42,7 @@ export default function TimelineStack({ items, zoneProgress, accentColor, depthO
         const depthOpacity =
           offsetFromActive === 0
             ? activeOpacity
-            : Math.min(1, 0.35 - offsetFromActive * 0.08 + depthOpacityBoost);
+            : Math.min(1, 0.4 - offsetFromActive * 0.08 + depthOpacityBoost);
 
         return (
           <motion.div
@@ -64,7 +64,7 @@ export default function TimelineStack({ items, zoneProgress, accentColor, depthO
             }}
             transition={{ duration: 0 }}
           >
-            <BeatCard item={item} accentColor={accentColor} />
+            <BeatCard item={item} accentColor={accentColor} solid={solidCards} />
 
             {offsetFromActive === 0 && (
               <div

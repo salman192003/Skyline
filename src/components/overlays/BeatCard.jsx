@@ -1,7 +1,7 @@
 // The shared visual "look" of a beat item — used by every layout (stack, grid, split)
 // so the design language (glow, typography, tag pills, stat line) stays identical
 // no matter how the cards are arranged on screen.
-export default function BeatCard({ item, accentColor, compact = false }) {
+export default function BeatCard({ item, accentColor, compact = false, solid = false }) {
   return (
     <div
       className="bento-card card"
@@ -14,6 +14,9 @@ export default function BeatCard({ item, accentColor, compact = false }) {
         boxSizing: 'border-box',
         display: 'flex',
         flexDirection: 'column',
+        // .bento-card is 72% opaque by default (glass effect) — override to
+        // near-solid when the card needs to read clearly on its own.
+        ...(solid ? { backgroundColor: 'var(--surface-container)' } : {}),
       }}
     >
       <div

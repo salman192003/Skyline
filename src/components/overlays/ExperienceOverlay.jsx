@@ -71,7 +71,13 @@ export default function ExperienceOverlay({ zoneProgress, active }) {
       accent="var(--primary)"
       bodyMaxWidth="700px"
     >
-      <TimelineStack items={items} zoneProgress={zoneProgress} accentColor="#FF0000" depthOpacityBoost={0.2} />
+      <TimelineStack
+        items={items}
+        zoneProgress={zoneProgress}
+        accentColor="#FF0000"
+        depthOpacityBoost={0.35}
+        solidCards
+      />
     </BeatPanel>
   );
 }
