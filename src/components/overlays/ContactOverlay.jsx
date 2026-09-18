@@ -8,12 +8,16 @@ const BOOT_SEQUENCE = [
   '> PROFILE: SALMAN_AJMAL',
   '> STATUS: OPEN TO OPPORTUNITIES',
   '> SKILLS: Full-stack, Cloud, ML/AI',
-  '> REACH OUT:',
-  '  |-- linkedin.com/in/salmanajmal',
-  '  |-- github.com/salman192003',
-  '  |__ salmanatwork1@gmail.com',
-  '> AWAITING YOUR MESSAGE...',
+  '> TYPE A COMMAND BELOW: linkedin / github / email / help',
 ];
+
+const LINKS = {
+  linkedin: 'https://linkedin.com/in/salmanajmal',
+  github: 'https://github.com/salman192003',
+  email: 'mailto:salmanatwork1@gmail.com',
+};
+
+const HELP_TEXT = 'AVAILABLE: linkedin · github · email · help · clear';
 
 export default function ContactOverlay({ zoneProgress, active }) {
   const fadeInStart = 0;
@@ -33,14 +37,21 @@ export default function ContactOverlay({ zoneProgress, active }) {
   const contentOpacity = remap(zoneProgress, 0.05, 0.25, 0, 1);
 
   const [terminalLines, setTerminalLines] = useState([]);
+  const [bootDone, setBootDone] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [history, setHistory] = useState([]); // { type: 'input' | 'response', text }
   const terminalRef = useRef(null);
+  const inputRef = useRef(null);
   const indexRef = useRef(0);
 
+  // Type out the boot sequence once the beat becomes visible
   useEffect(() => {
     if (!active || contentOpacity < 0.5) return;
 
     indexRef.current = 0;
     setTerminalLines([]);
+    setBootDone(false);
+    setHistory([]);
 
     const interval = setInterval(() => {
       if (indexRef.current < BOOT_SEQUENCE.length) {
@@ -48,17 +59,63 @@ export default function ContactOverlay({ zoneProgress, active }) {
         indexRef.current++;
       } else {
         clearInterval(interval);
+        setBootDone(true);
       }
     }, 150);
 
     return () => clearInterval(interval);
   }, [active, contentOpacity]);
 
+  // Auto-focus the input once boot sequence finishes and this beat is active
+  useEffect(() => {
+    if (bootDone && active && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [bootDone, active]);
+
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
-  }, [terminalLines]);
+  }, [terminalLines, history]);
+
+  const runCommand = (raw) => {
+    const cmd = raw.trim().toLowerCase();
+    if (!cmd) return;
+
+    if (cmd === 'clear') {
+      setHistory([]);
+      return;
+    }
+
+    if (cmd === 'help') {
+      setHistory((prev) => [...prev, { type: 'input', text: cmd }, { type: 'response', text: HELP_TEXT }]);
+      return;
+    }
+
+    if (LINKS[cmd]) {
+      setHistory((prev) => [
+        ...prev,
+        { type: 'input', text: cmd },
+        { type: 'response', text: `Opening ${cmd}...`, accent: true },
+      ]);
+      window.open(LINKS[cmd], '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    setHistory((prev) => [
+      ...prev,
+      { type: 'input', text: cmd },
+      { type: 'response', text: `command not found: "${cmd}" — try: linkedin, github, email, help` },
+    ]);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      runCommand(inputValue);
+      setInputValue('');
+    }
+  };
 
   return (
     <motion.div
@@ -92,7 +149,7 @@ export default function ContactOverlay({ zoneProgress, active }) {
             opacity: contentOpacity,
           }}
         >
-          {/* Terminal Block */}
+          {/* Interactive Terminal */}
           <div
             className="bento-card card"
             style={{
@@ -103,7 +160,9 @@ export default function ContactOverlay({ zoneProgress, active }) {
               backgroundColor: 'var(--surface-lowest)',
               border: '1px solid var(--surface-container-high)',
               fontFamily: 'monospace',
+              cursor: 'text',
             }}
+            onClick={() => inputRef.current?.focus()}
           >
             <div
               ref={terminalRef}
@@ -116,23 +175,73 @@ export default function ContactOverlay({ zoneProgress, active }) {
               }}
             >
               {terminalLines.map((line, i) => (
-                <div key={i} style={{ opacity: 0.9 }}>
+                <div key={`boot-${i}`} style={{ opacity: 0.9 }}>
                   <span style={{ color: 'var(--primary)', marginRight: '8px' }}>→</span>
                   {line}
                 </div>
               ))}
-              {terminalLines.length > 0 && terminalLines.length === BOOT_SEQUENCE.length && (
-                <motion.div
-                  style={{ marginTop: '12px', color: 'var(--accent-green)' }}
-                  animate={{ opacity: [0.5, 1] }}
-                  transition={{ duration: 0.8, repeat: Infinity }}
-                >
-                  <span style={{ marginRight: '8px' }}>→</span>
-                  <span style={{ animation: 'blink 1s infinite' }}>_</span>
-                </motion.div>
+
+              {history.map((entry, i) =>
+                entry.type === 'input' ? (
+                  <div key={`hist-${i}`} style={{ marginTop: '6px', color: 'var(--on-surface)' }}>
+                    <span style={{ color: 'var(--accent-green)', marginRight: '8px' }}>$</span>
+                    {entry.text}
+                  </div>
+                ) : (
+                  <div
+                    key={`hist-${i}`}
+                    style={{ color: entry.accent ? 'var(--accent-green)' : 'var(--on-surface-dim)', paddingLeft: '18px' }}
+                  >
+                    {entry.text}
+                  </div>
+                )
+              )}
+
+              {/* Live input line */}
+              {bootDone && (
+                <div style={{ marginTop: '6px', display: 'flex', alignItems: 'center', color: 'var(--accent-green)' }}>
+                  <span style={{ marginRight: '8px' }}>$</span>
+                  <span style={{ color: 'var(--on-surface)' }}>{inputValue}</span>
+                  <motion.span
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ duration: 0.8, repeat: Infinity }}
+                    style={{ display: 'inline-block', width: '7px', height: '13px', background: 'var(--accent-green)', marginLeft: '2px' }}
+                  />
+                  {/* Real (invisible) input capturing keystrokes */}
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    autoComplete="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    style={{
+                      position: 'absolute',
+                      opacity: 0,
+                      pointerEvents: 'none',
+                      width: 0,
+                      height: 0,
+                    }}
+                  />
+                </div>
               )}
             </div>
           </div>
+
+          <p
+            style={{
+              marginTop: '10px',
+              fontSize: '0.68rem',
+              color: 'var(--on-surface-dim)',
+              letterSpacing: '0.03em',
+            }}
+          >
+            Click the terminal and type <span style={{ color: 'var(--accent-green)' }}>linkedin</span>,{' '}
+            <span style={{ color: 'var(--accent-green)' }}>github</span>, or{' '}
+            <span style={{ color: 'var(--accent-green)' }}>email</span>, then hit Enter.
+          </p>
 
           {/* Skills Grid */}
           <div style={{ marginTop: '24px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px' }}>
@@ -164,13 +273,6 @@ export default function ContactOverlay({ zoneProgress, active }) {
           </div>
         </motion.div>
       </div>
-
-      <style>{`
-        @keyframes blink {
-          0%, 50% { opacity: 1; }
-          51%, 100% { opacity: 0; }
-        }
-      `}</style>
     </motion.div>
   );
 }

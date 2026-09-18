@@ -42,12 +42,17 @@ export default function ResearchOverlay({ zoneProgress, active }) {
       zoneProgress={zoneProgress}
       active={active}
       label="SECTION_04"
-      title="Research & Teaching"
+      title="Lab Notes & Lectures"
       subtitle="Deep dives & mentoring // Giving back while pushing forward"
       accent="var(--accent-green)"
       bodyMaxWidth="700px"
     >
-      <TimelineStack items={researchItems} zoneProgress={zoneProgress} accentColor="#3DFF7A" />
+      <TimelineStack
+        items={researchItems}
+        zoneProgress={zoneProgress}
+        accentColor="#3DFF7A"
+        depthOpacityBoost={0.15}
+      />
     </BeatPanel>
   );
 }

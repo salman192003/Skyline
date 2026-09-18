@@ -13,8 +13,8 @@ const educationItems = [
     title: 'Hobbies & Interests',
     subtitle: 'Outside the terminal',
     period: 'Ongoing',
-    description: 'Photography, gaming, building random side-projects, and way too much coffee. (Placeholder — swap in the real ones.)',
-    tags: ['PHOTOGRAPHY', 'GAMING', 'BUILDING STUFF', 'COFFEE'],
+    description: 'Photography, sketching, deep in gaming (competitive and just-for-fun alike), building random side-projects, and way too much coffee.',
+    tags: ['PHOTOGRAPHY', 'SKETCHING', 'GAMING', 'BUILDING STUFF', 'COFFEE'],
   },
 ];
 
@@ -24,7 +24,7 @@ export default function EducationOverlay({ zoneProgress, active }) {
       zoneProgress={zoneProgress}
       active={active}
       label="SECTION_01"
-      title="School & Fun Stuff"
+      title="Roots & Rabbit Holes"
       subtitle="Brain fuel and what keeps the mind sharp"
       accent="var(--accent-amber)"
       bodyMaxWidth="900px"

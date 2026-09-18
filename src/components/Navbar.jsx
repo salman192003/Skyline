@@ -7,7 +7,7 @@ import { BEAT_RANGES } from './hero-city/cityConfig';
 
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-export default function Navbar({ theme, toggleTheme }) {
+export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -123,18 +123,6 @@ export default function Navbar({ theme, toggleTheme }) {
             {link.label}
           </a>
         ))}
-
-        {/* Theme Toggle */}
-        <button
-          onClick={toggleTheme}
-          className="mode-toggle"
-          style={{ width: '36px', height: '36px' }}
-          aria-label="Toggle theme"
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-          </span>
-        </button>
       </div>
 
       {/* Mobile Menu Button */}
@@ -196,11 +184,6 @@ export default function Navbar({ theme, toggleTheme }) {
                 {link.label}
               </a>
             ))}
-            <button onClick={toggleTheme} className="mode-toggle" style={{ width: '36px', height: '36px', marginTop: '8px' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>
-                {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-              </span>
-            </button>
           </motion.div>
         )}
       </AnimatePresence>

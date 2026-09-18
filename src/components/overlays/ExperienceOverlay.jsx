@@ -66,7 +66,7 @@ export default function ExperienceOverlay({ zoneProgress, active }) {
       zoneProgress={zoneProgress}
       active={active}
       label="SECTION_02"
-      title="Career Moves"
+      title="On The Job"
       subtitle="Shipping code that matters // Real-world impact"
       accent="var(--primary)"
       bodyMaxWidth="700px"
