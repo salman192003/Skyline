@@ -3,18 +3,26 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   JOURNEY_PATH,
-  easeInOutExpo,
   remap,
 } from './cityConfig';
 
-// Easing for straight drives: lighter, snappier (near-linear)
-function easeLinear(x) {
-  return x;
+// Straight drives: gentle ease at the very start/end of each segment (not pure
+// linear) so consecutive segments blend into each other instead of meeting at
+// a hard velocity kink — still reads as brisk, just without the seam.
+function easeDrive(x) {
+  return x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
 }
 
-// Easing for turns: deliberate, smooth swing
+// Turns: a softer swing than expo — expo's near-instant middle snap read as
+// jerky rather than smooth. Cubic keeps the deliberate arc but rounds it out.
 function easeTurn(x) {
-  return easeInOutExpo(x);
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+}
+
+// Smooth in/out curve for the lean-into-turn tilt (replaces the old linear
+// triangle, which snapped to its peak rather than easing through it).
+function easeTilt(x) {
+  return Math.sin(x * Math.PI);
 }
 
 export default function CameraRig({ progressRef }) {
@@ -33,21 +41,19 @@ export default function CameraRig({ progressRef }) {
     const from = JOURNEY_PATH[segmentIndex];
     const to = JOURNEY_PATH[segmentIndex + 1];
 
-    // Use turn-optimized easing for turn waypoints, linear for straight drives
+    // Use turn-optimized easing for turn waypoints, gentled drive easing otherwise
     const isFromTurn = from.turn;
-    const eased = isFromTurn ? easeTurn(segmentProgress) : easeLinear(segmentProgress);
+    const eased = isFromTurn ? easeTurn(segmentProgress) : easeDrive(segmentProgress);
 
     camera.position.lerpVectors(from.pos, to.pos, eased);
     lookAtVec.current.lerpVectors(from.target, to.target, eased);
     camera.lookAt(lookAtVec.current);
 
-    // Apply subtle camera tilt during turns (simulating vehicle lean)
-    // Peak tilt at 50% through the turn segment
+    // Apply subtle camera tilt during turns (simulating vehicle lean), eased
+    // smoothly in and out rather than snapping linearly to its peak.
     let rollAngle = 0;
     if (isFromTurn) {
-      // Tilt builds to peak at ~50%, then subsides
-      const tiltAmount = eased < 0.5 ? eased * 2 : (1 - eased) * 2;
-      rollAngle = tiltAmount * 0.08; // ~4.6° max tilt
+      rollAngle = easeTilt(segmentProgress) * 0.08; // ~4.6° max tilt
     }
 
     // Apply roll to camera
