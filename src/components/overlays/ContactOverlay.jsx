@@ -11,7 +11,7 @@ const BOOT_SEQUENCE = [
   '> REACH OUT:',
   '  |-- linkedin.com/in/salmanajmal',
   '  |-- github.com/salman192003',
-  '  |__ salmanajmal@lums.edu.pk',
+  '  |__ salmanatwork1@gmail.com',
   '> AWAITING YOUR MESSAGE...',
 ];
 

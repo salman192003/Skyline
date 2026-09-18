@@ -8,7 +8,7 @@ const BOOT_SEQUENCE = [
   '> LINKS:',
   '  |-- linkedin.com/in/salmanajmal',
   '  |-- github.com/salman192003',
-  '  |__ salmanajmal@lums.edu.pk',
+  '  |__ salmanatwork1@gmail.com',
   '> AWAITING TRANSMISSION...',
 ];
 
@@ -285,8 +285,8 @@ export default function SkillsContactSection() {
                   onMouseEnter={(e) => e.target.style.borderColor = 'var(--accent-green)'}
                   onMouseLeave={(e) => e.target.style.borderColor = 'transparent'}
                   >github.com/salman192003</a></span>
-                ) : line.includes('lums.edu') ? (
-                  <span>  └─ <a href="mailto:salmanajmal@lums.edu.pk" style={{
+                ) : line.includes('gmail.com') ? (
+                  <span>  └─ <a href="mailto:salmanatwork1@gmail.com" style={{
                     color: 'var(--accent-green)',
                     textDecoration: 'none',
                     borderBottom: '1px solid transparent',
@@ -294,7 +294,7 @@ export default function SkillsContactSection() {
                   }}
                   onMouseEnter={(e) => e.target.style.borderColor = 'var(--accent-green)'}
                   onMouseLeave={(e) => e.target.style.borderColor = 'transparent'}
-                  >salmanajmal@lums.edu.pk</a></span>
+                  >salmanatwork1@gmail.com</a></span>
                 ) : (
                   line
                 )}
@@ -353,7 +353,7 @@ export default function SkillsContactSection() {
           </div>
 
           <a
-            href="mailto:salmanajmal@lums.edu.pk"
+            href="mailto:salmanatwork1@gmail.com"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
