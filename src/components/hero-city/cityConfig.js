@@ -527,17 +527,25 @@ function findPortalWindow(buildings, windows, targetZ = -26) {
   return best;
 }
 
-const PORTAL_WINDOW = findPortalWindow(BUILDINGS, WINDOWS);
+// Find portal windows for each beat of the journey
+const BEAT_WINDOWS = {
+  education: findPortalWindow(BUILDINGS, WINDOWS, -8),     // Education & Hobbies
+  experience: findPortalWindow(BUILDINGS, WINDOWS, -16),   // Experience
+  projects: findPortalWindow(BUILDINGS, WINDOWS, -22),     // Cool Projects
+  research: findPortalWindow(BUILDINGS, WINDOWS, -28),     // Research & Teaching
+  contact: findPortalWindow(BUILDINGS, WINDOWS, -34),      // How to get in touch?
+};
+
+// Legacy export: the last window (contact beat endpoint)
+const PORTAL_WINDOW = BEAT_WINDOWS.contact || findPortalWindow(BUILDINGS, WINDOWS);
 if (PORTAL_WINDOW) {
-  // Keep in sync with index.css's --hero-portal-green (Three.js materials
-  // can't consume CSS custom properties, so this stays a literal).
   PORTAL_WINDOW.color = '#3dff7a';
   PORTAL_WINDOW.lit = true;
   PORTAL_WINDOW.w *= 1.8;
   PORTAL_WINDOW.h *= 1.8;
   PORTAL_WINDOW.portal = true;
 }
-export { PORTAL_WINDOW };
+export { PORTAL_WINDOW, BEAT_WINDOWS };
 
 const portalNormal = PORTAL_WINDOW
   ? new THREE.Vector3(Math.sin(PORTAL_WINDOW.rotY), 0, Math.cos(PORTAL_WINDOW.rotY))
@@ -587,3 +595,67 @@ export function remap(value, inMin, inMax, outMin = 0, outMax = 1) {
   const t = Math.min(1, Math.max(0, (value - inMin) / (inMax - inMin)));
   return outMin + t * (outMax - outMin);
 }
+
+// Journey waypoints: intro → 5 beats → outro
+// Each beat (except intro) has a window lit in its accent color
+export const JOURNEY_WAYPOINTS = [
+  {
+    id: 'intro',
+    pos: SIDE_VIEW_POS.clone(),
+    target: SIDE_VIEW_TARGET.clone(),
+    window: null,
+    color: null,
+  },
+  {
+    id: 'education',
+    pos: null, // computed from window
+    target: null,
+    window: BEAT_WINDOWS.education,
+    color: '#FFB864', // --accent-amber
+  },
+  {
+    id: 'experience',
+    pos: null,
+    target: null,
+    window: BEAT_WINDOWS.experience,
+    color: '#FF0000', // --primary (red)
+  },
+  {
+    id: 'projects',
+    pos: null,
+    target: null,
+    window: BEAT_WINDOWS.projects,
+    color: '#22C3EE', // --accent-cyan
+  },
+  {
+    id: 'research',
+    pos: null,
+    target: null,
+    window: BEAT_WINDOWS.research,
+    color: '#3DFF7A', // --accent-green
+  },
+  {
+    id: 'contact',
+    pos: null,
+    target: null,
+    window: BEAT_WINDOWS.contact,
+    color: '#3DFF7A', // --accent-green (reuse)
+  },
+];
+
+// Compute pos/target from window for each beat
+JOURNEY_WAYPOINTS.forEach((waypoint) => {
+  if (waypoint.window) {
+    const windowNormal = new THREE.Vector3(
+      Math.sin(waypoint.window.rotY),
+      0,
+      Math.cos(waypoint.window.rotY)
+    );
+    waypoint.target = new THREE.Vector3(waypoint.window.x, waypoint.window.y, waypoint.window.z);
+    waypoint.pos = new THREE.Vector3(
+      waypoint.window.x + windowNormal.x * 0.85,
+      waypoint.window.y,
+      waypoint.window.z + windowNormal.z * 0.85
+    );
+  }
+});

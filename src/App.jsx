@@ -3,12 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Navbar from './components/Navbar';
-import HeroSection from './components/HeroSection';
-import EducationSection from './components/EducationSection';
-import ResearchSection from './components/ResearchSection';
-import ExperienceSection from './components/ExperienceSection';
-import ProjectsSection from './components/ProjectsSection';
-import SkillsContactSection from './components/SkillsContactSection';
+import CityJourney from './components/hero-city/CityJourney';
 import Footer from './components/Footer';
 import ProgressBar from './components/ProgressBar';
 import './index.css';
@@ -119,15 +114,7 @@ function App() {
 
       {/* Main Content */}
       <main ref={mainRef} style={{ position: 'relative' }}>
-        <HeroSection isLoaded={isLoaded} />
-        
-        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 24px' }}>
-          <EducationSection />
-          <ExperienceSection />
-          <ProjectsSection />
-          <ResearchSection />
-          <SkillsContactSection />
-        </div>
+        <CityJourney isLoaded={isLoaded} />
 
         <Footer />
       </main>
