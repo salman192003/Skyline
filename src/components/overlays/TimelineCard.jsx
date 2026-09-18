@@ -6,7 +6,25 @@ import BeatCard from './BeatCard';
 // are in the sequence; the active card itself swaps via AnimatePresence with a
 // real, fixed-duration transition — so moving from one card to the next always
 // has a deliberate delay/glide, never an instant snap, no matter how fast you scroll.
-export default function TimelineStack({ items, zoneProgress, accentColor, solidCards = false }) {
+export default function TimelineStack({ items, zoneProgress, accentColor, solidCards = false, flat = false }) {
+  if (flat) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        {items.map((item, idx) => (
+          <motion.div
+            key={item.title}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.5, delay: idx * 0.05, ease: 'easeOut' }}
+          >
+            <BeatCard item={item} accentColor={accentColor} solid={solidCards} />
+          </motion.div>
+        ))}
+      </div>
+    );
+  }
+
   const sliceSize = 1 / items.length;
   const activeIndex = Math.min(Math.floor(zoneProgress / sliceSize), items.length - 1);
   const activeItem = items[activeIndex];

@@ -33,18 +33,20 @@ const items = projects.map((proj) => ({
   stat: proj.stat ? `${proj.stat.label}: ${proj.stat.value}` : null,
 }));
 
-export default function ProjectsOverlay({ zoneProgress, active }) {
+export default function ProjectsOverlay({ zoneProgress, active, flat = false }) {
   return (
     <BeatPanel
       zoneProgress={zoneProgress}
       active={active}
+      flat={flat}
+      id="projects"
       label="SECTION_03"
       title="Projects"
       subtitle="Things I've built and loved building // Proof of concept"
       accent="var(--accent-cyan)"
       bodyMaxWidth="1000px"
     >
-      <CardGrid items={items} zoneProgress={zoneProgress} accentColor="#22C3EE" />
+      <CardGrid items={items} zoneProgress={zoneProgress} accentColor="#22C3EE" flat={flat} />
     </BeatPanel>
   );
 }

@@ -5,7 +5,7 @@ import BeatCard from './BeatCard';
 // Side-by-side split — for a beat with just a couple of items where hiding one
 // behind the other would waste the content rather than pace it (education +
 // hobbies). Both cards visible together, entering from opposite sides.
-export default function SplitPanel({ items, zoneProgress, accentColor }) {
+export default function SplitPanel({ items, zoneProgress, accentColor, flat = false }) {
   return (
     <div
       style={{
@@ -16,6 +16,21 @@ export default function SplitPanel({ items, zoneProgress, accentColor }) {
       }}
     >
       {items.map((item, idx) => {
+        if (flat) {
+          return (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.5, delay: idx * 0.1, ease: 'easeOut' }}
+              style={{ minHeight: '300px' }}
+            >
+              <BeatCard item={item} accentColor={accentColor} />
+            </motion.div>
+          );
+        }
+
         // Each card's entrance clearly waits for the previous one to finish —
         // 0.2 to fade in, then a 0.15 pause before the next card starts.
         const cardDelayStart = 0.05 + idx * 0.35;

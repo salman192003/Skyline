@@ -60,11 +60,13 @@ const items = experiences.map((exp) => ({
   stat: exp.stat ? `${exp.stat.label}: ${exp.stat.value}` : null,
 }));
 
-export default function ExperienceOverlay({ zoneProgress, active }) {
+export default function ExperienceOverlay({ zoneProgress, active, flat = false }) {
   return (
     <BeatPanel
       zoneProgress={zoneProgress}
       active={active}
+      flat={flat}
+      id="experience"
       label="SECTION_02"
       title="Experience"
       subtitle="Shipping code that matters // Real-world impact"
@@ -76,6 +78,7 @@ export default function ExperienceOverlay({ zoneProgress, active }) {
         zoneProgress={zoneProgress}
         accentColor="#FF0000"
         solidCards
+        flat={flat}
       />
     </BeatPanel>
   );

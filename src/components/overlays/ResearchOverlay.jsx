@@ -36,11 +36,13 @@ const researchItems = [
   },
 ];
 
-export default function ResearchOverlay({ zoneProgress, active }) {
+export default function ResearchOverlay({ zoneProgress, active, flat = false }) {
   return (
     <BeatPanel
       zoneProgress={zoneProgress}
       active={active}
+      flat={flat}
+      id="research"
       label="SECTION_04"
       title="Research & Teaching"
       subtitle="Deep dives & mentoring // Giving back while pushing forward"
@@ -52,6 +54,7 @@ export default function ResearchOverlay({ zoneProgress, active }) {
         zoneProgress={zoneProgress}
         accentColor="#3DFF7A"
         solidCards
+        flat={flat}
       />
     </BeatPanel>
   );

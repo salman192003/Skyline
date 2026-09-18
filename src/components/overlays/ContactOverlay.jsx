@@ -23,22 +23,23 @@ const LINKS = {
 
 const HELP_TEXT = 'AVAILABLE: linkedin · github · email · help · clear';
 
-export default function ContactOverlay({ zoneProgress, active }) {
+export default function ContactOverlay({ zoneProgress, active, flat = false }) {
   const fadeInStart = 0;
   const fadeInEnd = 0.15;
   const fadeOutStart = 0.8;
   const fadeOutEnd = 1;
 
-  const opacity =
-    zoneProgress < fadeInStart
-      ? 0
-      : zoneProgress < fadeInEnd
-      ? remap(zoneProgress, fadeInStart, fadeInEnd, 0, 1)
-      : zoneProgress < fadeOutStart
-      ? 1
-      : remap(zoneProgress, fadeOutStart, fadeOutEnd, 1, 0);
+  const opacity = flat
+    ? 1
+    : zoneProgress < fadeInStart
+    ? 0
+    : zoneProgress < fadeInEnd
+    ? remap(zoneProgress, fadeInStart, fadeInEnd, 0, 1)
+    : zoneProgress < fadeOutStart
+    ? 1
+    : remap(zoneProgress, fadeOutStart, fadeOutEnd, 1, 0);
 
-  const contentOpacity = remap(zoneProgress, 0.05, 0.25, 0, 1);
+  const contentOpacity = flat ? 1 : remap(zoneProgress, 0.05, 0.25, 0, 1);
 
   const [terminalLines, setTerminalLines] = useState([]);
   const [bootDone, setBootDone] = useState(false);
@@ -48,9 +49,31 @@ export default function ContactOverlay({ zoneProgress, active }) {
   const inputRef = useRef(null);
   const indexRef = useRef(0);
 
+  // In flat (mobile) mode there's no scroll-driven "active" beat — boot once
+  // the terminal scrolls into view instead.
+  const [flatInView, setFlatInView] = useState(!flat);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (!flat || !containerRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setFlatInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.3 }
+    );
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [flat]);
+
+  const shouldBoot = flat ? flatInView : active && contentOpacity >= 0.5;
+
   // Type out the boot sequence once the beat becomes visible
   useEffect(() => {
-    if (!active || contentOpacity < 0.5) return;
+    if (!shouldBoot) return;
 
     indexRef.current = 0;
     setTerminalLines([]);
@@ -68,14 +91,15 @@ export default function ContactOverlay({ zoneProgress, active }) {
     }, 150);
 
     return () => clearInterval(interval);
-  }, [active, contentOpacity]);
+  }, [shouldBoot]);
 
-  // Auto-focus the input once boot sequence finishes and this beat is active
+  // Auto-focus the input once boot sequence finishes (desktop only — focusing
+  // an input on mobile pops the keyboard up unprompted, which is unwelcome)
   useEffect(() => {
-    if (bootDone && active && inputRef.current) {
+    if (bootDone && active && !flat && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [bootDone, active]);
+  }, [bootDone, active, flat]);
 
   useEffect(() => {
     if (terminalRef.current) {
@@ -123,21 +147,27 @@ export default function ContactOverlay({ zoneProgress, active }) {
 
   return (
     <motion.div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 'clamp(20px, 4vh, 36px)',
-        opacity,
-        pointerEvents: active ? 'auto' : 'none',
-        zIndex: 10,
-        padding: '96px 32px 32px',
-      }}
+      id={flat ? 'contact' : undefined}
+      ref={containerRef}
+      style={
+        flat
+          ? { padding: '80px 24px', opacity }
+          : {
+              position: 'fixed',
+              inset: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 'clamp(20px, 4vh, 36px)',
+              opacity,
+              pointerEvents: active ? 'auto' : 'none',
+              zIndex: 10,
+              padding: '96px 32px 32px',
+            }
+      }
     >
-      <div style={{ maxWidth: '700px', width: '100%' }}>
+      <div style={{ maxWidth: '700px', width: '100%', margin: flat ? '0 auto' : undefined }}>
         <motion.div style={{ opacity: contentOpacity }}>
           <SectionHeader
             label="SECTION_05"

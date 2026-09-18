@@ -23,54 +23,64 @@ const OVERLAY_COMPONENTS = [
   ContactOverlay,
 ];
 
+const DESKTOP_QUERY = '(min-width: 768px) and (prefers-reduced-motion: no-preference)';
+
 export default function CityJourney({ isLoaded }) {
   const sectionRef = useRef(null);
   const progressRef = useRef(0);
   const [overlayProgress, setOverlayProgress] = useState(0);
   const [activeWaypoint, setActiveWaypoint] = useState(0);
 
+  // Desktop gets the full pinned 3D journey; mobile / reduced-motion gets a
+  // flat stacked page instead — and skips the Three.js canvas entirely
+  // (heavy on phones, and there's no pinned scroll to drive its camera on
+  // this path anyway).
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== 'undefined' ? window.matchMedia(DESKTOP_QUERY).matches : true
+  );
+
   useEffect(() => {
-    if (!isLoaded || !sectionRef.current) return;
+    const mql = window.matchMedia(DESKTOP_QUERY);
+    const onChange = () => setIsDesktop(mql.matches);
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
 
-    const mm = gsap.matchMedia();
+  useEffect(() => {
+    if (!isLoaded || !isDesktop || !sectionRef.current) return;
 
-    mm.add(
-      {
-        isDesktop: '(min-width: 768px) and (prefers-reduced-motion: no-preference)',
-        isReduced: '(prefers-reduced-motion: reduce)',
-        isMobile: '(max-width: 767px)',
-      },
-      (context) => {
-        const { isDesktop } = context.conditions;
+    const ctx = gsap.context(() => {
+      ScrollTrigger.create({
+        id: 'city-journey',
+        trigger: sectionRef.current,
+        start: 'top top',
+        end: '+=1800%',
+        scrub: 0.4,
+        pin: true,
+        anticipatePin: 1,
+        onUpdate: (self) => {
+          progressRef.current = self.progress;
+          setOverlayProgress(self.progress);
+          const activeBeat = BEAT_RANGES.findIndex(
+            (beat) => self.progress >= beat.startT && self.progress <= beat.endT
+          );
+          setActiveWaypoint(Math.max(0, activeBeat));
+        },
+      });
+    }, sectionRef);
 
-        if (isDesktop) {
-          ScrollTrigger.create({
-            id: 'city-journey',
-            trigger: sectionRef.current,
-            start: 'top top',
-            end: '+=1800%', // Shorter: faster paced journey
-            scrub: 0.4, // Lower = snappier catch-up after nav jumps, still smooth on normal scroll
-            pin: true,
-            anticipatePin: 1,
-            onUpdate: (self) => {
-              progressRef.current = self.progress;
-              setOverlayProgress(self.progress);
-              // Determine active beat (0–5) based on which BEAT_RANGES slice we're in
-              const activeBeat = BEAT_RANGES.findIndex(
-                (beat) => self.progress >= beat.startT && self.progress <= beat.endT
-              );
-              setActiveWaypoint(Math.max(0, activeBeat));
-            },
-          });
-        } else {
-          // Mobile / reduced motion: no pin, fall back to flat stack
-          // Return to default scroll behavior (handled by flat sections in App)
-        }
-      }
+    return () => ctx.revert();
+  }, [isLoaded, isDesktop]);
+
+  if (!isDesktop) {
+    return (
+      <div id="journey">
+        {OVERLAY_COMPONENTS.map((Component, i) => (
+          <Component key={BEAT_RANGES[i].id} flat />
+        ))}
+      </div>
     );
-
-    return () => mm.revert();
-  }, [isLoaded]);
+  }
 
   return (
     <>
@@ -92,7 +102,6 @@ export default function CityJourney({ isLoaded }) {
         <AnimatePresence>
           {OVERLAY_COMPONENTS.map((Component, i) => {
             const beat = BEAT_RANGES[i];
-            // Compute zone progress (local 0–1 for this beat)
             const zoneProgress = remap(overlayProgress, beat.startT, beat.endT, 0, 1);
             const isActive = activeWaypoint === i;
 

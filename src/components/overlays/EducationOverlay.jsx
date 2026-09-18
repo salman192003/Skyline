@@ -18,18 +18,20 @@ const educationItems = [
   },
 ];
 
-export default function EducationOverlay({ zoneProgress, active }) {
+export default function EducationOverlay({ zoneProgress, active, flat = false }) {
   return (
     <BeatPanel
       zoneProgress={zoneProgress}
       active={active}
+      flat={flat}
+      id="education"
       label="SECTION_01"
       title="Education"
       subtitle="Brain fuel and what keeps the mind sharp"
       accent="var(--accent-amber)"
       bodyMaxWidth="900px"
     >
-      <SplitPanel items={educationItems} zoneProgress={zoneProgress} accentColor="#FFB864" />
+      <SplitPanel items={educationItems} zoneProgress={zoneProgress} accentColor="#FFB864" flat={flat} />
     </BeatPanel>
   );
 }

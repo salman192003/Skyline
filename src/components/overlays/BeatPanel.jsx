@@ -15,7 +15,34 @@ export default function BeatPanel({
   accent,
   bodyMaxWidth = '700px',
   children,
+  flat = false,
+  id,
 }) {
+  if (flat) {
+    return (
+      <section id={id} style={{ padding: '80px 24px', maxWidth: bodyMaxWidth, margin: '0 auto' }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        >
+          <SectionHeader label={label} title={title} subtitle={subtitle} accent={accent} />
+        </motion.div>
+
+        <motion.div
+          style={{ marginTop: '32px', position: 'relative' }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
+        >
+          {typeof children === 'function' ? children(1) : children}
+        </motion.div>
+      </section>
+    );
+  }
+
   const fadeInStart = 0;
   const fadeInEnd = 0.15;
   const fadeOutStart = 0.8;
