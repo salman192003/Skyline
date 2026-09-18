@@ -37,7 +37,7 @@ export default function Navbar({ theme, toggleTheme }) {
       // Land just past the beat's start so it reads as active immediately.
       const targetProgress = Math.min(beat.startT + 0.03, beat.endT - 0.01);
       const targetY = trigger.start + (trigger.end - trigger.start) * targetProgress;
-      gsap.to(window, { duration: 1.3, scrollTo: targetY, ease: 'power2.inOut' });
+      gsap.to(window, { duration: 0.5, scrollTo: targetY, ease: 'power3.out', overwrite: 'auto' });
     } else {
       document.getElementById(beatId)?.scrollIntoView({ behavior: 'smooth' });
     }

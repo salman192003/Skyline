@@ -49,7 +49,7 @@ export default function CityJourney({ isLoaded }) {
             trigger: sectionRef.current,
             start: 'top top',
             end: '+=1800%', // Shorter: faster paced journey
-            scrub: 1.2,
+            scrub: 0.4, // Lower = snappier catch-up after nav jumps, still smooth on normal scroll
             pin: true,
             anticipatePin: 1,
             onUpdate: (self) => {
@@ -129,7 +129,7 @@ export default function CityJourney({ isLoaded }) {
             e.preventDefault();
             const trigger = ScrollTrigger.getById('city-journey');
             if (trigger) {
-              gsap.to(window, { duration: 1.2, scrollTo: trigger.end, ease: 'power2.inOut' });
+              gsap.to(window, { duration: 0.6, scrollTo: trigger.end, ease: 'power3.out', overwrite: 'auto' });
             }
           }}
         >
