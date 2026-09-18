@@ -27,9 +27,9 @@ const projects = [
 ];
 
 export default function ProjectsOverlay({ zoneProgress, active }) {
-  const fadeInStart = 0.05;
-  const fadeInEnd = 0.35;
-  const fadeOutStart = 0.65;
+  const fadeInStart = 0;
+  const fadeInEnd = 0.15;
+  const fadeOutStart = 0.8;
   const fadeOutEnd = 1;
 
   const opacity =
@@ -41,7 +41,7 @@ export default function ProjectsOverlay({ zoneProgress, active }) {
       ? 1
       : remap(zoneProgress, fadeOutStart, fadeOutEnd, 1, 0);
 
-  const contentOpacity = remap(zoneProgress, 0.2, 0.4, 0, 1);
+  const contentOpacity = remap(zoneProgress, 0.05, 0.25, 0, 1);
 
   return (
     <motion.div

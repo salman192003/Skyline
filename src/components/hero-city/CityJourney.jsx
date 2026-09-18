@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import HeroCityScene from './HeroCityScene';
-import { JOURNEY_WAYPOINTS, remap } from './cityConfig';
+import { BEAT_RANGES, remap } from './cityConfig';
 import IntroductionOverlay from '../overlays/IntroductionOverlay';
 import EducationOverlay from '../overlays/EducationOverlay';
 import ExperienceOverlay from '../overlays/ExperienceOverlay';
@@ -46,20 +46,18 @@ export default function CityJourney({ isLoaded }) {
           ScrollTrigger.create({
             trigger: sectionRef.current,
             start: 'top top',
-            end: '+=2600%',
+            end: '+=1800%', // Shorter: faster paced journey
             scrub: 1.2,
             pin: true,
             anticipatePin: 1,
             onUpdate: (self) => {
               progressRef.current = self.progress;
               setOverlayProgress(self.progress);
-              // Determine active waypoint (0–5)
-              const numWaypoints = JOURNEY_WAYPOINTS.length;
-              const waypointIndex = Math.min(
-                Math.floor(self.progress * (numWaypoints - 1)),
-                numWaypoints - 1
-              );
-              setActiveWaypoint(waypointIndex);
+              // Determine active beat (0–5) based on which BEAT_RANGES slice we're in
+              const activeBeat = BEAT_RANGES.findIndex((beat, i) => {
+                return self.progress >= beat.startT && self.progress <= beat.endT;
+              });
+              setActiveWaypoint(Math.max(0, activeBeat));
             },
           });
         } else {
@@ -88,23 +86,20 @@ export default function CityJourney({ isLoaded }) {
           <HeroCityScene progressRef={progressRef} />
         </div>
 
-        {/* Waypoint overlays */}
+        {/* Beat overlays */}
         <AnimatePresence>
           {OVERLAY_COMPONENTS.map((Component, i) => {
-            const waypoint = JOURNEY_WAYPOINTS[i];
-            // Compute zone progress (local 0–1 for this overlay)
-            const numWaypoints = JOURNEY_WAYPOINTS.length - 1;
-            const zoneStart = (i) / numWaypoints;
-            const zoneEnd = (i + 1) / numWaypoints;
-            const zoneProgress = remap(overlayProgress, zoneStart, zoneEnd, 0, 1);
-            const isActive = activeWaypoint === i || (activeWaypoint === i + 1 && zoneProgress < 0.5);
+            const beat = BEAT_RANGES[i];
+            // Compute zone progress (local 0–1 for this beat)
+            const zoneProgress = remap(overlayProgress, beat.startT, beat.endT, 0, 1);
+            const isActive = activeWaypoint === i;
 
             return (
               <Component
-                key={waypoint.id}
+                key={beat.id}
                 zoneProgress={zoneProgress}
                 active={isActive}
-                waypoint={waypoint}
+                beat={beat}
               />
             );
           })}

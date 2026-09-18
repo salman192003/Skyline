@@ -2,9 +2,10 @@ import { motion } from 'framer-motion';
 import { remap } from '../hero-city/cityConfig';
 
 export default function IntroductionOverlay({ zoneProgress, active }) {
+  // Snappier timing: fade in over first 15%, hold until 80%, fade out over last 20%
   const fadeInStart = 0;
-  const fadeInEnd = 0.3;
-  const fadeOutStart = 0.7;
+  const fadeInEnd = 0.15;
+  const fadeOutStart = 0.8;
   const fadeOutEnd = 1;
 
   const opacity =
@@ -16,7 +17,7 @@ export default function IntroductionOverlay({ zoneProgress, active }) {
       ? 1
       : remap(zoneProgress, fadeOutStart, fadeOutEnd, 1, 0);
 
-  const scale = remap(zoneProgress, 0, 0.3, 0.95, 1);
+  const scale = remap(zoneProgress, 0, 0.15, 0.95, 1);
 
   return (
     <motion.div

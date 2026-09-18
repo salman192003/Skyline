@@ -563,6 +563,60 @@ export const FINAL_CAMERA_POS = PORTAL_WINDOW
     )
   : INTO_CITY_POS.clone();
 
+// Driving path through the city grid: a sequence of waypoints forming a route
+// that drives down streets and turns at intersections. Combined with BEAT_RANGES,
+// this lets overlays key off the journey without needing dedicated per-beat waypoints.
+export const JOURNEY_PATH = [
+  // Intro: wide establishing shot (camera starts here)
+  { pos: SIDE_VIEW_POS.clone(), target: SIDE_VIEW_TARGET.clone(), turn: false },
+
+  // Intro → Education: drive down the main avenue (x=0)
+  { pos: new THREE.Vector3(0, 2.7, 22), target: new THREE.Vector3(0, 2.3, 5), turn: false },
+  { pos: new THREE.Vector3(0, 2.7, 8), target: new THREE.Vector3(0, 2.3, -8), turn: false },
+
+  // Turn at cross street (transition to Education → Experience)
+  // Swing 90° to move along a cross street (y fixed at 2.7, now moving along x)
+  { pos: new THREE.Vector3(0, 2.7, -14), target: new THREE.Vector3(8.2, 2.3, -14), turn: true },
+
+  // Education → Experience: drive along a cross street
+  { pos: new THREE.Vector3(12, 2.7, -14), target: new THREE.Vector3(20, 2.3, -14), turn: false },
+
+  // Turn back toward the avenue
+  { pos: new THREE.Vector3(18, 2.7, -16.4), target: new THREE.Vector3(8, 2.3, -24), turn: true },
+
+  // Experience: back down another section
+  { pos: new THREE.Vector3(0.7, 2.7, -22), target: new THREE.Vector3(0, 2.3, -30), turn: false },
+
+  // Turn for Projects
+  { pos: new THREE.Vector3(0, 2.7, -28), target: new THREE.Vector3(-8.2, 2.3, -28), turn: true },
+
+  // Projects: cross street
+  { pos: new THREE.Vector3(-14, 2.7, -28), target: new THREE.Vector3(-20, 2.3, -28), turn: false },
+
+  // Turn back
+  { pos: new THREE.Vector3(-16.4, 2.7, -30.8), target: new THREE.Vector3(-8, 2.3, -38), turn: true },
+
+  // Research: final avenue stretch before convergence
+  { pos: new THREE.Vector3(0.7, 2.7, -34), target: new THREE.Vector3(0, 2.3, -40), turn: false },
+
+  // Final turn toward the portal window
+  { pos: new THREE.Vector3(0, 2.7, -32), target: FINAL_CAMERA_TARGET, turn: true },
+
+  // Contact: converge into the glowing window (finale)
+  { pos: FINAL_CAMERA_POS, target: FINAL_CAMERA_TARGET, turn: false },
+];
+
+// Beat ranges: which slice of the overall path (0–1) each beat occupies
+// Used by overlays to know when to fade in/out, independent of waypoint density
+export const BEAT_RANGES = [
+  { id: 'intro', startT: 0.00, endT: 0.12, color: '#FF0000', label: 'Introduction' },
+  { id: 'education', startT: 0.12, endT: 0.28, color: '#FFB864', label: 'Education & Hobbies' },
+  { id: 'experience', startT: 0.28, endT: 0.44, color: '#FF0000', label: 'Experience' },
+  { id: 'projects', startT: 0.44, endT: 0.60, color: '#22C3EE', label: 'Cool Projects' },
+  { id: 'research', startT: 0.60, endT: 0.76, color: '#3DFF7A', label: 'Research & Teaching' },
+  { id: 'contact', startT: 0.76, endT: 1.00, color: '#3DFF7A', label: 'How to get in touch?' },
+];
+
 export const COLORS = {
   ground: '#0c0d10',
   sidewalk: '#71757d',
