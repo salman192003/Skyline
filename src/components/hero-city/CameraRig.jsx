@@ -20,6 +20,7 @@ function easeTurn(x) {
 export default function CameraRig({ progressRef }) {
   const { camera } = useThree();
   const lookAtVec = useRef(new THREE.Vector3());
+  const euler = useRef(new THREE.Euler(0, 0, 0, 'YXZ'));
 
   useFrame(() => {
     const p = progressRef.current ?? 0;
@@ -39,6 +40,20 @@ export default function CameraRig({ progressRef }) {
     camera.position.lerpVectors(from.pos, to.pos, eased);
     lookAtVec.current.lerpVectors(from.target, to.target, eased);
     camera.lookAt(lookAtVec.current);
+
+    // Apply subtle camera tilt during turns (simulating vehicle lean)
+    // Peak tilt at 50% through the turn segment
+    let rollAngle = 0;
+    if (isFromTurn) {
+      // Tilt builds to peak at ~50%, then subsides
+      const tiltAmount = eased < 0.5 ? eased * 2 : (1 - eased) * 2;
+      rollAngle = tiltAmount * 0.08; // ~4.6° max tilt
+    }
+
+    // Apply roll to camera
+    euler.current.setFromQuaternion(camera.quaternion, 'YXZ');
+    euler.current.z = rollAngle;
+    camera.quaternion.setFromEuler(euler.current);
   });
 
   return null;

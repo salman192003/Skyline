@@ -528,19 +528,32 @@ function findPortalWindow(buildings, windows, targetZ = -26) {
 }
 
 // Find portal windows for each beat of the journey
-const BEAT_WINDOWS = {
-  education: findPortalWindow(BUILDINGS, WINDOWS, -8),     // Education & Hobbies
-  experience: findPortalWindow(BUILDINGS, WINDOWS, -16),   // Experience
-  projects: findPortalWindow(BUILDINGS, WINDOWS, -22),     // Cool Projects
-  research: findPortalWindow(BUILDINGS, WINDOWS, -28),     // Research & Teaching
-  contact: findPortalWindow(BUILDINGS, WINDOWS, -34),      // How to get in touch?
-};
+const BEAT_WINDOWS_DATA = [
+  { beat: 'education', targetZ: -8, color: '#FFB864' },     // amber
+  { beat: 'experience', targetZ: -16, color: '#FF0000' },   // red
+  { beat: 'projects', targetZ: -22, color: '#22C3EE' },     // cyan
+  { beat: 'research', targetZ: -28, color: '#3DFF7A' },     // green
+  { beat: 'contact', targetZ: -34, color: '#3DFF7A' },      // green
+];
+
+const BEAT_WINDOWS = {};
+BEAT_WINDOWS_DATA.forEach(({ beat, targetZ, color }) => {
+  const win = findPortalWindow(BUILDINGS, WINDOWS, targetZ);
+  if (win) {
+    win.color = color;
+    win.lit = true;
+    // Contact is larger (finale), others are normal ambient size
+    if (beat !== 'contact') {
+      win.w *= 1.2;
+      win.h *= 1.2;
+    }
+  }
+  BEAT_WINDOWS[beat] = win;
+});
 
 // Legacy export: the last window (contact beat endpoint)
 const PORTAL_WINDOW = BEAT_WINDOWS.contact || findPortalWindow(BUILDINGS, WINDOWS);
 if (PORTAL_WINDOW) {
-  PORTAL_WINDOW.color = '#3dff7a';
-  PORTAL_WINDOW.lit = true;
   PORTAL_WINDOW.w *= 1.8;
   PORTAL_WINDOW.h *= 1.8;
   PORTAL_WINDOW.portal = true;
@@ -566,37 +579,46 @@ export const FINAL_CAMERA_POS = PORTAL_WINDOW
 // Driving path through the city grid: a sequence of waypoints forming a route
 // that drives down streets and turns at intersections. Combined with BEAT_RANGES,
 // this lets overlays key off the journey without needing dedicated per-beat waypoints.
+// Intermediate waypoints are added for smooth curves.
 export const JOURNEY_PATH = [
   // Intro: wide establishing shot (camera starts here)
   { pos: SIDE_VIEW_POS.clone(), target: SIDE_VIEW_TARGET.clone(), turn: false },
 
-  // Intro → Education: drive down the main avenue (x=0)
-  { pos: new THREE.Vector3(0, 2.7, 22), target: new THREE.Vector3(0, 2.3, 5), turn: false },
+  // Intro → Education: drive down the main avenue (x=0) with smooth waypoints
+  { pos: new THREE.Vector3(0, 2.7, 22), target: new THREE.Vector3(0, 2.3, 10), turn: false },
+  { pos: new THREE.Vector3(0, 2.7, 15), target: new THREE.Vector3(0, 2.3, 3), turn: false },
   { pos: new THREE.Vector3(0, 2.7, 8), target: new THREE.Vector3(0, 2.3, -8), turn: false },
 
   // Turn at cross street (transition to Education → Experience)
-  // Swing 90° to move along a cross street (y fixed at 2.7, now moving along x)
-  { pos: new THREE.Vector3(0, 2.7, -14), target: new THREE.Vector3(8.2, 2.3, -14), turn: true },
+  { pos: new THREE.Vector3(0, 2.7, -11), target: new THREE.Vector3(4, 2.3, -14), turn: true },
+  { pos: new THREE.Vector3(0, 2.7, -14), target: new THREE.Vector3(8.2, 2.3, -14), turn: false },
 
-  // Education → Experience: drive along a cross street
+  // Education → Experience: drive along cross street with smooth waypoints
+  { pos: new THREE.Vector3(6, 2.7, -14), target: new THREE.Vector3(14, 2.3, -14), turn: false },
   { pos: new THREE.Vector3(12, 2.7, -14), target: new THREE.Vector3(20, 2.3, -14), turn: false },
 
   // Turn back toward the avenue
-  { pos: new THREE.Vector3(18, 2.7, -16.4), target: new THREE.Vector3(8, 2.3, -24), turn: true },
+  { pos: new THREE.Vector3(16, 2.7, -15), target: new THREE.Vector3(8, 2.3, -22), turn: true },
+  { pos: new THREE.Vector3(18, 2.7, -16.4), target: new THREE.Vector3(8, 2.3, -24), turn: false },
 
-  // Experience: back down another section
+  // Experience: back down avenue with smooth waypoints
+  { pos: new THREE.Vector3(8, 2.7, -20), target: new THREE.Vector3(0, 2.3, -28), turn: false },
   { pos: new THREE.Vector3(0.7, 2.7, -22), target: new THREE.Vector3(0, 2.3, -30), turn: false },
 
   // Turn for Projects
-  { pos: new THREE.Vector3(0, 2.7, -28), target: new THREE.Vector3(-8.2, 2.3, -28), turn: true },
+  { pos: new THREE.Vector3(0, 2.7, -25), target: new THREE.Vector3(-4, 2.3, -28), turn: true },
+  { pos: new THREE.Vector3(0, 2.7, -28), target: new THREE.Vector3(-8.2, 2.3, -28), turn: false },
 
-  // Projects: cross street
+  // Projects: cross street with smooth waypoints
+  { pos: new THREE.Vector3(-6, 2.7, -28), target: new THREE.Vector3(-14, 2.3, -28), turn: false },
   { pos: new THREE.Vector3(-14, 2.7, -28), target: new THREE.Vector3(-20, 2.3, -28), turn: false },
 
-  // Turn back
-  { pos: new THREE.Vector3(-16.4, 2.7, -30.8), target: new THREE.Vector3(-8, 2.3, -38), turn: true },
+  // Turn back toward avenue
+  { pos: new THREE.Vector3(-16, 2.7, -29), target: new THREE.Vector3(-8, 2.3, -36), turn: true },
+  { pos: new THREE.Vector3(-16.4, 2.7, -30.8), target: new THREE.Vector3(-8, 2.3, -38), turn: false },
 
-  // Research: final avenue stretch before convergence
+  // Research: final avenue stretch with smooth waypoints
+  { pos: new THREE.Vector3(-8, 2.7, -32), target: new THREE.Vector3(0, 2.3, -40), turn: false },
   { pos: new THREE.Vector3(0.7, 2.7, -34), target: new THREE.Vector3(0, 2.3, -40), turn: false },
 
   // Final turn toward the portal window
