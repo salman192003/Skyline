@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import * as THREE from 'three';
 import { Stars, Billboard } from '@react-three/drei';
-import { COLORS } from './cityConfig';
+import { getSceneColors } from './cityConfig';
 
 // Three-stop vertical gradient: fog-matched horizon -> warm city-glow band -> cool zenith.
-function useGradientSkyGeometry() {
+function useGradientSkyGeometry(theme) {
   return useMemo(() => {
+    const COLORS = getSceneColors();
     const geometry = new THREE.SphereGeometry(220, 24, 16);
     const pos = geometry.attributes.position;
     const colors = new Float32Array(pos.count * 3);
@@ -34,7 +35,7 @@ function useGradientSkyGeometry() {
 
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     return geometry;
-  }, []);
+  }, [theme]);
 }
 
 // A soft radial glow texture -- reused (at different scales/opacities) for the
@@ -93,10 +94,11 @@ function makeMoonTexture(seed = 11) {
   return new THREE.CanvasTexture(canvas);
 }
 
-export default function Sky() {
-  const geometry = useGradientSkyGeometry();
+export default function Sky({ theme = 'dark' }) {
+  const geometry = useGradientSkyGeometry(theme);
+  const COLORS = getSceneColors();
   const moonTexture = useMemo(() => makeMoonTexture(), []);
-  const haloTexture = useMemo(() => makeGlowTexture(COLORS.moon), []);
+  const haloTexture = useMemo(() => makeGlowTexture(COLORS.moon), [theme]);
 
   return (
     <group>

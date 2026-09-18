@@ -114,7 +114,7 @@ function App() {
 
       {/* Main Content */}
       <main ref={mainRef} style={{ position: 'relative' }}>
-        <CityJourney isLoaded={isLoaded} />
+        <CityJourney isLoaded={isLoaded} theme={theme} />
 
         <Footer />
       </main>
