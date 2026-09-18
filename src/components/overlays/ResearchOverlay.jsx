@@ -42,7 +42,7 @@ export default function ResearchOverlay({ zoneProgress, active }) {
       zoneProgress={zoneProgress}
       active={active}
       label="SECTION_04"
-      title="Lab Notes & Lectures"
+      title="Research & Teaching"
       subtitle="Deep dives & mentoring // Giving back while pushing forward"
       accent="var(--accent-green)"
       bodyMaxWidth="700px"

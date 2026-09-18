@@ -24,7 +24,7 @@ export default function EducationOverlay({ zoneProgress, active }) {
       zoneProgress={zoneProgress}
       active={active}
       label="SECTION_01"
-      title="Roots & Rabbit Holes"
+      title="Education"
       subtitle="Brain fuel and what keeps the mind sharp"
       accent="var(--accent-amber)"
       bodyMaxWidth="900px"

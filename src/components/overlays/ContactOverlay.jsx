@@ -141,7 +141,7 @@ export default function ContactOverlay({ zoneProgress, active }) {
         <motion.div style={{ opacity: contentOpacity }}>
           <SectionHeader
             label="SECTION_05"
-            title="How to Get In Touch?"
+            title="Contact"
             subtitle="Let's build something together // Open to collaboration"
             accent="var(--accent-green)"
           />

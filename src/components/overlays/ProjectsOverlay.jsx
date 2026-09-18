@@ -39,7 +39,7 @@ export default function ProjectsOverlay({ zoneProgress, active }) {
       zoneProgress={zoneProgress}
       active={active}
       label="SECTION_03"
-      title="Things I've Shipped"
+      title="Projects"
       subtitle="Things I've built and loved building // Proof of concept"
       accent="var(--accent-cyan)"
       bodyMaxWidth="1000px"
