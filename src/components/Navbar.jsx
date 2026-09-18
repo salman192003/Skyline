@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { BEAT_RANGES } from './hero-city/cityConfig';
+
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 export default function Navbar({ theme, toggleTheme }) {
   const [scrolled, setScrolled] = useState(false);
@@ -12,13 +18,30 @@ export default function Navbar({ theme, toggleTheme }) {
   }, []);
 
   const navLinks = [
-    { label: 'EDUCATION', href: '#education' },
-    { label: 'RESEARCH', href: '#research' },
-    { label: 'EXPERIENCE', href: '#experience' },
-    { label: 'PROJECTS', href: '#projects' },
-    { label: 'RESUME', href: '/resume.pdf' },
-    { label: 'CONNECT', href: '#contact' },
+    { label: 'INTRO', beatId: 'intro' },
+    { label: 'EDUCATION', beatId: 'education' },
+    { label: 'EXPERIENCE', beatId: 'experience' },
+    { label: 'PROJECTS', beatId: 'projects' },
+    { label: 'RESEARCH', beatId: 'research' },
+    { label: 'CONNECT', beatId: 'contact' },
   ];
+
+  // Jump directly to a beat's stretch of the pinned city-journey scroll. Falls back
+  // to a plain anchor scroll if the journey's ScrollTrigger isn't active (mobile /
+  // reduced-motion, where beats render as a flat stack instead).
+  const jumpToBeat = (beatId) => {
+    const trigger = ScrollTrigger.getById('city-journey');
+    const beat = BEAT_RANGES.find((b) => b.id === beatId);
+
+    if (trigger && beat) {
+      // Land just past the beat's start so it reads as active immediately.
+      const targetProgress = Math.min(beat.startT + 0.03, beat.endT - 0.01);
+      const targetY = trigger.start + (trigger.end - trigger.start) * targetProgress;
+      gsap.to(window, { duration: 1.3, scrollTo: targetY, ease: 'power2.inOut' });
+    } else {
+      document.getElementById(beatId)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <motion.nav
@@ -74,7 +97,7 @@ export default function Navbar({ theme, toggleTheme }) {
         {navLinks.map((link) => (
           <a
             key={link.label}
-            href={link.href}
+            href={`#${link.beatId}`}
             className="font-headline"
             style={{
               fontSize: '0.7rem',
@@ -84,6 +107,11 @@ export default function Navbar({ theme, toggleTheme }) {
               transition: 'color 0.3s ease',
               textTransform: 'uppercase',
               fontWeight: 500,
+              cursor: 'pointer',
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              jumpToBeat(link.beatId);
             }}
             onMouseEnter={(e) => e.target.style.color = 'var(--primary)'}
             onMouseLeave={(e) => {
@@ -150,9 +178,13 @@ export default function Navbar({ theme, toggleTheme }) {
             {navLinks.map((link) => (
               <a
                 key={link.label}
-                href={link.href}
+                href={`#${link.beatId}`}
                 className="font-headline"
-                onClick={() => setMenuOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setMenuOpen(false);
+                  jumpToBeat(link.beatId);
+                }}
                 style={{
                   fontSize: '0.85rem',
                   letterSpacing: '0.12em',

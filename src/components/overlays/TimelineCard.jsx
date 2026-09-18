@@ -1,176 +1,187 @@
 import { motion } from 'framer-motion';
 import { remap } from '../hero-city/cityConfig';
 
-export default function TimelineCard({
-  index,
-  total,
-  item,
-  zoneProgress,
-  isLeft,
-}) {
-  // Stagger cards: each appears after the previous one
-  // First card starts at 5%, appears over next 10%, then holds
-  const cardStart = 0.05 + (index * 0.12);
-  const cardEnd = cardStart + 0.15;
+// Renders a stack of cards (one active + up to 2 behind, receding in depth) within
+// whatever box its parent provides. Purely relative/absolute — no viewport-fixed
+// positioning of its own, so it always respects the layout the parent (BeatPanel) sets up.
+export default function TimelineStack({ items, zoneProgress, accentColor }) {
+  const sliceSize = 1 / items.length;
 
-  // Only render if we're in this card's time window
-  if (zoneProgress < cardStart - 0.05) return null;
+  const activeIndex = Math.min(Math.floor(zoneProgress / sliceSize), items.length - 1);
+  const activeCardStart = activeIndex * sliceSize;
+  const activeCardEnd = (activeIndex + 1) * sliceSize;
 
-  const cardProgress = remap(zoneProgress, cardStart, cardEnd, 0, 1);
-  const opacity = Math.min(1, Math.max(0, cardProgress * 1.2)); // Ease in slightly past 1
-  const scale = 0.85 + opacity * 0.15; // Scale from 0.85 to 1
-  const y = (1 - opacity) * 40; // Slide down as it appears
+  const fadeInEnd = activeCardStart + sliceSize * 0.15;
+  const fadeOutStart = activeCardEnd - sliceSize * 0.15;
+
+  let activeOpacity = 0;
+  if (zoneProgress >= activeCardStart && zoneProgress <= fadeInEnd) {
+    activeOpacity = remap(zoneProgress, activeCardStart, fadeInEnd, 0, 1);
+  } else if (zoneProgress > fadeInEnd && zoneProgress < fadeOutStart) {
+    activeOpacity = 1;
+  } else if (zoneProgress >= fadeOutStart && zoneProgress <= activeCardEnd) {
+    activeOpacity = remap(zoneProgress, fadeOutStart, activeCardEnd, 1, 0);
+  }
 
   return (
-    <motion.div
+    <div
       style={{
-        opacity,
-        scale,
-        y,
         position: 'relative',
-        zIndex: index,
+        width: '100%',
+        height: '100%',
+        perspective: '1200px',
       }}
-      transition={{ duration: 0 }} // Driven by zoneProgress, no easing needed
     >
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: isLeft ? '1fr auto' : 'auto 1fr',
-          gap: '32px',
-          alignItems: 'start',
-          marginBottom: '60px',
-        }}
-      >
-        {/* Card content */}
-        <div
-          className="bento-card card"
-          style={{
-            padding: '24px',
-            '--card-tint': 'var(--surface-container)',
-            position: 'relative',
-            overflow: 'hidden',
-            gridColumn: isLeft ? 1 : 2,
-          }}
-        >
-          <div
+      {items.map((item, idx) => {
+        const offsetFromActive = idx - activeIndex;
+        if (offsetFromActive < 0 || offsetFromActive > 2) return null; // active + 2 behind
+
+        const depthScale = Math.max(0.88, 1 - offsetFromActive * 0.05);
+        const depthY = offsetFromActive * 16;
+        const depthOpacity = offsetFromActive === 0 ? activeOpacity : 0.35 - offsetFromActive * 0.08;
+
+        return (
+          <motion.div
+            key={`stack-${idx}`}
             style={{
               position: 'absolute',
-              top: '-30px',
-              right: isLeft ? 'auto' : '-30px',
-              left: isLeft ? '-30px' : 'auto',
-              width: '120px',
-              height: '120px',
-              borderRadius: '50%',
-              background: item.accentColor ? `${item.accentColor}20` : 'var(--primary-glow)',
-              filter: 'blur(50px)',
-              pointerEvents: 'none',
+              left: 0,
+              top: 0,
+              width: '100%',
+              height: '100%',
+              opacity: Math.max(0, depthOpacity),
+              scale: depthScale,
+              y: depthY,
+              rotateX: offsetFromActive * 2 + 'deg',
+              zIndex: 10 - offsetFromActive,
+              pointerEvents: offsetFromActive === 0 ? 'auto' : 'none',
             }}
-          />
+            transition={{ duration: 0 }}
+          >
+            <div
+              className="bento-card card"
+              style={{
+                padding: 'clamp(24px, 4vw, 40px)',
+                '--card-tint': 'var(--surface-container)',
+                position: 'relative',
+                overflow: 'hidden',
+                height: '100%',
+                boxSizing: 'border-box',
+                boxShadow: `0 ${12 + offsetFromActive * 8}px ${40 + offsetFromActive * 20}px rgba(0,0,0,${0.2 + offsetFromActive * 0.1})`,
+              }}
+            >
+              {/* Glow background — consistent with hero section's accent glows */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '-60px',
+                  right: '-60px',
+                  width: '200px',
+                  height: '200px',
+                  borderRadius: '50%',
+                  background: `${accentColor}30`,
+                  filter: 'blur(80px)',
+                  pointerEvents: 'none',
+                }}
+              />
 
-          <div style={{ position: 'relative', zIndex: 1 }}>
-            <h3
-              className="font-headline"
-              style={{
-                fontSize: '1rem',
-                fontWeight: 700,
-                color: 'var(--on-surface)',
-                marginBottom: '4px',
-              }}
-            >
-              {item.title}
-            </h3>
-            <p
-              style={{
-                fontSize: '0.8rem',
-                color: 'var(--on-surface-dim)',
-                marginBottom: '12px',
-              }}
-            >
-              {item.subtitle} · {item.period}
-            </p>
-            <p
-              style={{
-                fontSize: '0.8rem',
-                color: 'var(--on-surface-variant)',
-                lineHeight: 1.6,
-                marginBottom: '12px',
-              }}
-            >
-              {item.description}
-            </p>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <h2
+                  className="font-headline"
+                  style={{
+                    fontSize: 'clamp(1.2rem, 4vw, 1.6rem)',
+                    fontWeight: 700,
+                    color: 'var(--on-surface)',
+                    letterSpacing: '-0.02em',
+                    marginBottom: '8px',
+                  }}
+                >
+                  {item.title}
+                  <span style={{ color: accentColor }}>.</span>
+                </h2>
 
-            {item.tags && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {item.tags.map((tag) => (
-                  <span
-                    key={tag}
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', marginBottom: '16px' }}>
+                  {item.subtitle && (
+                    <p style={{ fontSize: '0.82rem', color: 'var(--on-surface-dim)', fontWeight: 500 }}>
+                      {item.subtitle}
+                    </p>
+                  )}
+                  {item.period && (
+                    <span
+                      className="dot-matrix"
+                      style={{ fontSize: '0.72rem', color: accentColor, letterSpacing: '0.05em' }}
+                    >
+                      {item.period}
+                    </span>
+                  )}
+                </div>
+
+                <p
+                  style={{
+                    fontSize: '0.88rem',
+                    color: 'var(--on-surface-variant)',
+                    lineHeight: 1.7,
+                    marginBottom: '20px',
+                  }}
+                >
+                  {item.description}
+                </p>
+
+                {item.tags && item.tags.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+                    {item.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        style={{
+                          padding: '5px 12px',
+                          background: accentColor,
+                          color: 'var(--on-accent-light)',
+                          borderRadius: '4px',
+                          fontSize: '0.65rem',
+                          fontWeight: 600,
+                          letterSpacing: '0.05em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {item.stat && (
+                  <div
                     style={{
-                      padding: '3px 10px',
-                      background: item.accentColor || 'var(--accent-green)',
-                      color: 'var(--on-accent-light)',
-                      borderRadius: '3px',
-                      fontSize: '0.65rem',
+                      fontSize: '0.8rem',
+                      color: accentColor,
                       fontWeight: 600,
                       letterSpacing: '0.05em',
                     }}
                   >
-                    {tag}
-                  </span>
-                ))}
+                    → {item.stat}
+                  </div>
+                )}
               </div>
-            )}
 
-            {item.stat && (
-              <div
-                style={{
-                  marginTop: '12px',
-                  fontSize: '0.75rem',
-                  color: item.accentColor || 'var(--accent-green)',
-                  fontWeight: 600,
-                }}
-              >
-                {item.stat}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Timeline dot and line */}
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gridColumn: isLeft ? 2 : 1,
-            marginTop: '12px',
-          }}
-        >
-          {/* Dot */}
-          <div
-            style={{
-              width: '16px',
-              height: '16px',
-              borderRadius: '50%',
-              background: item.accentColor || 'var(--accent-green)',
-              border: '3px solid var(--surface)',
-              boxShadow: `0 0 12px ${item.accentColor || 'var(--accent-green)'}40`,
-              zIndex: 10,
-            }}
-          />
-
-          {/* Line to next (if not last) */}
-          {index < total - 1 && (
-            <div
-              style={{
-                width: '2px',
-                height: '52px',
-                background: 'var(--surface-container-high)',
-                marginTop: '8px',
-              }}
-            />
-          )}
-        </div>
-      </div>
-    </motion.div>
+              {offsetFromActive === 0 && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '16px',
+                    right: '20px',
+                    fontSize: '0.7rem',
+                    color: 'var(--on-surface-dim)',
+                    opacity: 0.5,
+                    letterSpacing: '0.05em',
+                  }}
+                >
+                  {activeIndex + 1} / {items.length}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        );
+      })}
+    </div>
   );
 }

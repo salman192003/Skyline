@@ -66,12 +66,14 @@ export default function ContactOverlay({ zoneProgress, active }) {
         position: 'fixed',
         inset: 0,
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
+        gap: 'clamp(20px, 4vh, 36px)',
         opacity,
         pointerEvents: active ? 'auto' : 'none',
         zIndex: 10,
-        padding: '0 32px',
+        padding: '96px 32px 32px',
       }}
     >
       <div style={{ maxWidth: '700px', width: '100%' }}>
@@ -86,7 +88,7 @@ export default function ContactOverlay({ zoneProgress, active }) {
 
         <motion.div
           style={{
-            marginTop: '40px',
+            marginTop: '32px',
             opacity: contentOpacity,
           }}
         >

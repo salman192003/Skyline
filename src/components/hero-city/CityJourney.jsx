@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import HeroCityScene from './HeroCityScene';
 import { BEAT_RANGES, remap } from './cityConfig';
 import IntroductionOverlay from '../overlays/IntroductionOverlay';
@@ -11,7 +12,7 @@ import ProjectsOverlay from '../overlays/ProjectsOverlay';
 import ResearchOverlay from '../overlays/ResearchOverlay';
 import ContactOverlay from '../overlays/ContactOverlay';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 const OVERLAY_COMPONENTS = [
   IntroductionOverlay,
@@ -44,6 +45,7 @@ export default function CityJourney({ isLoaded }) {
 
         if (isDesktop) {
           ScrollTrigger.create({
+            id: 'city-journey',
             trigger: sectionRef.current,
             start: 'top top',
             end: '+=1800%', // Shorter: faster paced journey
@@ -54,9 +56,9 @@ export default function CityJourney({ isLoaded }) {
               progressRef.current = self.progress;
               setOverlayProgress(self.progress);
               // Determine active beat (0–5) based on which BEAT_RANGES slice we're in
-              const activeBeat = BEAT_RANGES.findIndex((beat, i) => {
-                return self.progress >= beat.startT && self.progress <= beat.endT;
-              });
+              const activeBeat = BEAT_RANGES.findIndex(
+                (beat) => self.progress >= beat.startT && self.progress <= beat.endT
+              );
               setActiveWaypoint(Math.max(0, activeBeat));
             },
           });
@@ -105,9 +107,9 @@ export default function CityJourney({ isLoaded }) {
           })}
         </AnimatePresence>
 
-        {/* Skip to full resume link */}
+        {/* Skip to end of journey (lands right after the pin releases, at the Footer) */}
         <motion.a
-          href="#flat-resume"
+          href="#footer"
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.6 }}
           whileHover={{ opacity: 1 }}
@@ -125,8 +127,10 @@ export default function CityJourney({ isLoaded }) {
           }}
           onClick={(e) => {
             e.preventDefault();
-            // Scroll to top so flat sections below are visible
-            window.scrollTo({ top: window.innerHeight * 3, behavior: 'smooth' });
+            const trigger = ScrollTrigger.getById('city-journey');
+            if (trigger) {
+              gsap.to(window, { duration: 1.2, scrollTo: trigger.end, ease: 'power2.inOut' });
+            }
           }}
         >
           SKIP JOURNEY
