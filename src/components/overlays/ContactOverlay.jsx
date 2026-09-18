@@ -8,6 +8,10 @@ const BOOT_SEQUENCE = [
   '> PROFILE: SALMAN_AJMAL',
   '> STATUS: OPEN TO OPPORTUNITIES',
   '> SKILLS: Full-stack, Cloud, ML/AI',
+  '> CONTACT:',
+  '  |-- LinkedIn: linkedin.com/in/salman-ajmal',
+  '  |-- GitHub:   github.com/salman192003',
+  '  |__ Email:    salmanatwork1@gmail.com',
   '> TYPE A COMMAND BELOW: linkedin / github / email / help',
 ];
 
