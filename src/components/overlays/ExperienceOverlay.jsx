@@ -75,7 +75,6 @@ export default function ExperienceOverlay({ zoneProgress, active }) {
         items={items}
         zoneProgress={zoneProgress}
         accentColor="#FF0000"
-        depthOpacityBoost={0.35}
         solidCards
       />
     </BeatPanel>
