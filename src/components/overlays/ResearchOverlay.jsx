@@ -51,7 +51,7 @@ export default function ResearchOverlay({ zoneProgress, active }) {
         items={researchItems}
         zoneProgress={zoneProgress}
         accentColor="#3DFF7A"
-        depthOpacityBoost={0.15}
+        depthOpacityBoost={0.2}
       />
     </BeatPanel>
   );

@@ -28,7 +28,7 @@ export default function Footer() {
       <div style={{ display: 'flex', gap: '24px' }}>
         {[
           { label: 'GITHUB', url: 'https://github.com/salman192003' },
-          { label: 'LINKEDIN', url: 'https://linkedin.com/in/salmanajmal' },
+          { label: 'LINKEDIN', url: 'https://www.linkedin.com/in/salman-ajmal/' },
           { label: 'EMAIL', url: 'mailto:salmanatwork1@gmail.com' },
         ].map((link) => (
           <a

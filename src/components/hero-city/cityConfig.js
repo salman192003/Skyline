@@ -630,13 +630,16 @@ export const JOURNEY_PATH = [
 
 // Beat ranges: which slice of the overall path (0–1) each beat occupies
 // Used by overlays to know when to fade in/out, independent of waypoint density
+// Experience and Research get a wider slice than the others (0.20 vs 0.14-0.16)
+// so scrolling through them feels a bit slower/more deliberate — same total
+// journey length, just more of it allocated to these two beats.
 export const BEAT_RANGES = [
   { id: 'intro', startT: 0.00, endT: 0.12, color: '#FF0000', label: 'Introduction' },
-  { id: 'education', startT: 0.12, endT: 0.28, color: '#FFB864', label: 'Education & Hobbies' },
-  { id: 'experience', startT: 0.28, endT: 0.44, color: '#FF0000', label: 'Experience' },
-  { id: 'projects', startT: 0.44, endT: 0.60, color: '#22C3EE', label: 'Cool Projects' },
-  { id: 'research', startT: 0.60, endT: 0.76, color: '#3DFF7A', label: 'Research & Teaching' },
-  { id: 'contact', startT: 0.76, endT: 1.00, color: '#3DFF7A', label: 'How to get in touch?' },
+  { id: 'education', startT: 0.12, endT: 0.26, color: '#FFB864', label: 'Education & Hobbies' },
+  { id: 'experience', startT: 0.26, endT: 0.46, color: '#FF0000', label: 'Experience' },
+  { id: 'projects', startT: 0.46, endT: 0.60, color: '#22C3EE', label: 'Cool Projects' },
+  { id: 'research', startT: 0.60, endT: 0.80, color: '#3DFF7A', label: 'Research & Teaching' },
+  { id: 'contact', startT: 0.80, endT: 1.00, color: '#3DFF7A', label: 'How to get in touch?' },
 ];
 
 export const COLORS = {

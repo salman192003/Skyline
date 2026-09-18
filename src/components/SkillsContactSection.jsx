@@ -6,7 +6,7 @@ const BOOT_SEQUENCE = [
   '> LOADING PROFILE: SALMAN_AJMAL',
   '> STATUS: OPEN TO OPPORTUNITIES',
   '> LINKS:',
-  '  |-- linkedin.com/in/salmanajmal',
+  '  |-- linkedin.com/in/salman-ajmal',
   '  |-- github.com/salman192003',
   '  |__ salmanatwork1@gmail.com',
   '> AWAITING TRANSMISSION...',
@@ -266,7 +266,7 @@ export default function SkillsContactSection() {
                     : 'var(--on-surface-variant)',
               }}>
                 {line.includes('linkedin') ? (
-                  <span>  ├─ <a href="https://linkedin.com/in/salmanajmal" target="_blank" rel="noopener noreferrer" style={{
+                  <span>  ├─ <a href="https://www.linkedin.com/in/salman-ajmal/" target="_blank" rel="noopener noreferrer" style={{
                     color: 'var(--accent-green)',
                     textDecoration: 'none',
                     borderBottom: '1px solid transparent',
@@ -274,7 +274,7 @@ export default function SkillsContactSection() {
                   }}
                   onMouseEnter={(e) => e.target.style.borderColor = 'var(--accent-green)'}
                   onMouseLeave={(e) => e.target.style.borderColor = 'transparent'}
-                  >linkedin.com/in/salmanajmal</a></span>
+                  >linkedin.com/in/salman-ajmal</a></span>
                 ) : line.includes('github') ? (
                   <span>  ├─ <a href="https://github.com/salman192003" target="_blank" rel="noopener noreferrer" style={{
                     color: 'var(--accent-green)',

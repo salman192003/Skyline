@@ -12,7 +12,7 @@ const BOOT_SEQUENCE = [
 ];
 
 const LINKS = {
-  linkedin: 'https://linkedin.com/in/salmanajmal',
+  linkedin: 'https://www.linkedin.com/in/salman-ajmal/',
   github: 'https://github.com/salman192003',
   email: 'mailto:salmanatwork1@gmail.com',
 };
