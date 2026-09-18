@@ -1,5 +1,5 @@
 import BeatPanel from './BeatPanel';
-import VerticalTimeline from './VerticalTimeline';
+import TimelineStack from './TimelineCard';
 
 const experiences = [
   {
@@ -55,7 +55,7 @@ const items = experiences.map((exp) => ({
   title: exp.company,
   subtitle: exp.role,
   period: exp.period,
-  description: exp.highlights[0],
+  description: exp.highlights.join(' • '),
   tags: exp.tags,
   stat: exp.stat ? `${exp.stat.label}: ${exp.stat.value}` : null,
 }));
@@ -69,9 +69,15 @@ export default function ExperienceOverlay({ zoneProgress, active }) {
       title="Experience"
       subtitle="Shipping code that matters // Real-world impact"
       accent="var(--primary)"
-      bodyMaxWidth="650px"
+      bodyMaxWidth="700px"
     >
-      <VerticalTimeline items={items} zoneProgress={zoneProgress} accentColor="#FF0000" />
+      <TimelineStack
+        items={items}
+        zoneProgress={zoneProgress}
+        accentColor="#FF0000"
+        depthOpacityBoost={0.35}
+        solidCards
+      />
     </BeatPanel>
   );
 }
