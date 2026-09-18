@@ -53,12 +53,16 @@ export default function BeatPanel({
         <SectionHeader label={label} title={title} subtitle={subtitle} accent={accent} />
       </motion.div>
 
-      {/* Body — layout varies per beat (stack / grid / split), sizing varies too */}
+      {/* Body — layout varies per beat (stack / grid / split / list), sizing varies too.
+          maxHeight + overflow is a safety net for taller content (e.g. a full vertical
+          timeline) so it never gets clipped by the fixed-position wrapper. */}
       <motion.div
         style={{
           opacity: contentOpacity,
           width: '100%',
           maxWidth: bodyMaxWidth,
+          maxHeight: 'calc(100vh - 260px)',
+          overflowY: 'auto',
           position: 'relative',
         }}
       >
